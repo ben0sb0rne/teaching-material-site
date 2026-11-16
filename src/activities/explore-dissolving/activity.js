@@ -190,7 +190,6 @@
     'beaker':    ['Beaker', '250 mL beaker.'],
     'stirbar':   ['Stir bar', 'Magnetic stir bar. Spins when the stir plate is on.'],
     'stirplate': ['Stir plate', 'Magnetic stir plate. Spins the stir bar from below.'],
-    'probe':     ['Probe', 'Sends the magnified view to the viewport.'],
     'nozzle':    ['Nozzle', 'Water outlet.'],
     'chute':     ['Powder chute', 'Adds a measured sample of powder.'],
     /* The head is one part in the art, so it answers for the whole assembly

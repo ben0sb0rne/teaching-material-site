@@ -58,6 +58,11 @@
     this.stage = opts.stage;
     this.base = opts.assets || 'assets/layers/';
     this.stations = opts.stations;
+    /* Matched against a built layer id to find its station. Built from the
+       list rather than written out, because the written-out version named
+       sugar and caco3: a station outside it got no data-station and no
+       builder, and said nothing about it. */
+    this.stationRe = new RegExp('-(' + opts.stations.join('|') + ')$');
     this.build = opts.build || {};
     this.onIdentify = opts.onIdentify || function () {};
     this.boxes = {};
@@ -163,8 +168,8 @@
   Instrument.prototype.place = function (id) {
     var box = this.box(id);
     var kind = this.render(id);
-    var station = /-(sugar|caco3)$/.exec(id);
-    var custom = this.build[id] || this.build[id.replace(/-(sugar|caco3)$/, '-{s}')];
+    var station = this.stationRe.exec(id);
+    var custom = this.build[id] || this.build[id.replace(this.stationRe, '-{s}')];
 
     var node = el(custom && custom.tag ? custom.tag : 'div', 'layer');
     node.dataset.layer = id;
