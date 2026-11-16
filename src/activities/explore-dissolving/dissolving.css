@@ -53,16 +53,6 @@
   --p-mgso4-lit:   #F2D97A;  --p-mgso4-dim:   #6E5610;
   --p-cacl2-lit:   #F7A9BF;  --p-cacl2-dim:   #78243C;
 
-  /* The powder itself, at the magnifications where you would be looking at
-     powder rather than at a model of it. All six substances are white in
-     the hand — that is the lesson's own point and why the beaker art is
-     shared — so the zoom's beaker, hand-lens and grain steps draw in these
-     and only the particle view uses the hues above. Drawing a 10 mm field
-     of Epsom salts in --p-mgso4 would be claiming it is yellow. */
-  --powder:     #D8D4C8;
-  --powder-lit: #F2EFE7;
-  --powder-dim: #A8A396;
-
   /* Boiling. A bubble is a pocket of vapour, so it reads lighter than the
      water it rises through, with a bright cap where the light catches it.
      Tuned against the placeholder water; re-check when the render lands. */
@@ -972,12 +962,6 @@ body {
     /* Pull back the space the unscaled box would otherwise reserve. */
     margin-bottom: calc(-1000px * (1 - var(--print-s, .62)));
   }
-  /* shortcut: printing while the zoom is stepped out gives the particle
-     view rather than the beaker or grain on screen, because this is the
-     canvas the chain draws on. Right for the absent student the page is
-     for, surprising for anyone printing mid-chain. Upgrade when a teacher
-     wants the chain itself on paper: that needs the zoom on its own
-     canvas, which costs the whole stacking argument above. */
   .viewport__dry, .layer[data-render="raster-overlay"] { display: none; }
   .key:focus-visible::after,
   .plate:focus-visible::after { display: none; }

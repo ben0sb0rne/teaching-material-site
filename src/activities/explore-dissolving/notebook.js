@@ -49,27 +49,6 @@
         id: 'lab',
         title: 'Lab',
         items: [
-          /* First, because the zoom is the first thing on screen and because
-             every other item depends on it: a student who reads the viewport
-             as one grain cannot reason about particles at all. This is the
-             misconception the posttests actually showed. */
-          { id: 'lab-scale',
-            type: 'choice',
-            tags: 'Engage · CG5',
-            text: 'Step the viewport out to the beaker and back in again. The ' +
-                  'whole round view is 13.6 nanometres across. How much of one ' +
-                  'grain of salt is that?',
-            choices: ['The whole grain',
-                      'About half a grain',
-                      'A tiny part of one grain',
-                      'Several grains at once'],
-            correct: 2,
-            nudge: 'Zoom out one step and read the scale bar. A grain of salt is ' +
-                   'about 0.3 millimetres; this view is 13.6 nanometres.',
-            completion: 'It would take about 22,000 of these views to cross one ' +
-                        'grain of salt. The viewport is inside a grain, not ' +
-                        'around one.' },
-
           { id: 'lab-predict',
             type: 'prediction',
             tags: 'Engage · CG2',

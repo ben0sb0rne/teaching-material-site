@@ -56,10 +56,11 @@
   var SOLVENT = BUILD.solvent;
 
   /* The field radius is picked, not arbitrary. At a radius of 6.79 nm — so
-     13.58 nm across — the fifty solute particles fill five whole rows of the floor — 6, 9, 10, 12, 13 — so the
-     heap is level across the top, its widest row is the top one, and nothing
-     is left over to perch on the summit as a stub. That heap stands about a
-     third of the way up the field, leaving the rest to the water. */
+     13.58 nm across — the fifty solute particles fill five whole rows of
+     the floor — 6, 9, 10, 12, 13 — so the heap is level across the top, its
+     widest row is the top one, and nothing is left over to perch on the
+     summit as a stub. That heap stands about a third of the way up the
+     field, leaving the rest to the water. */
   var RADII = {
     solvent: (BUILD.waterNm / 2) / FIELD_NM,
     solute:  (SOLUTE_NM / 2) / FIELD_NM      // 0.0663 of the field radius
@@ -68,95 +69,6 @@
   // What 1 nm is worth as a fraction of the field's radius.
   var NM_FRACTION = 1 / FIELD_NM;
   var DURATION = 3600;     // 60 seconds at 60 frames a second
-
-  /* ---- the magnification chain ------------------------------------------
-
-     Students read this viewport as one grain of the powder. It is not. The
-     field is 13.58 nm across and a grain of table salt is about 0.3 mm, so
-     one grain is some 22,000 of these views wide. The zoom says so by
-     starting at the beaker and stepping in, naming the instrument that
-     could see each step — and the last step names none, because nothing
-     can see a particle.
-
-     Fields are DIAMETERS in nanometres. FIELD_NM is the field's RADIUS, so
-     the live field is FIELD_NM * 2. Get that wrong and every bar in steps
-     1-3 is exactly twice too long and looks entirely plausible.
-
-     The BAR runs in clean decades — 10 mm, 1 mm, 0.1 mm, 1 nm — because
-     that is what a student reads. The FIELDS do not, and deliberately: the
-     third step is 0.4 mm rather than a tidy 1 mm so that one grain of
-     table salt, the lesson's reference case, very nearly fills the frame.
-     At 1 mm it was eight grains with "One grain" written under it, which
-     is the same lie the zoom exists to correct. Round field widths are
-     worth nothing to anybody; landing on the grain is the whole ask.
-
-     100 mm at the first step, not 70: the viewport is circularly clipped,
-     and a 70 mm beaker in a 70 mm field would lose its corners. */
-  var MM = 1e6;                     // nanometres in a millimetre
-
-  var ZOOM = [
-    { field: 100 * MM, bar: 10 * MM, barLabel: '10 mm',
-      barDesc: '10 millimetres — one centimetre.',
-      cap: 'The beaker',
-      viewDesc: 'This is what your eyes see — 100 millimetres across.',
-      reticleAt: [0, 0.60] },
-
-    { field: 10 * MM, bar: 1 * MM, barLabel: '1 mm',
-      barDesc: '1 millimetre.',
-      cap: 'Grains of powder',
-      viewDesc: '10 millimetres across. A hand lens shows the powder is separate grains.',
-      reticleAt: [0, 0] },
-
-    /* No line and no reticle, both on purpose. The line is written per
-       substance, because a grain of Epsom salts overruns this frame while
-       chalk is dust. And the box the next view comes from would be a
-       hundredth of a point across — not a drawing problem but the whole
-       lesson, so the readout says the number instead. */
-    { field: 0.4 * MM, bar: 0.1 * MM, barLabel: '0.1 mm',
-      barDesc: 'One tenth of a millimetre.',
-      cap: null, viewDesc: null,      // both written per substance
-      reticleAt: null },
-
-    { field: FIELD_NM * 2, bar: 1, barLabel: '1 nm',
-      barDesc: '1 nanometre, one billionth of a metre.',
-      cap: null,                      // the working view carries no caption
-      viewDesc: '13.6 nanometres across — 22,000 of these would cross one grain of table salt.',
-      reticleAt: null }
-  ];
-
-  var LAST = ZOOM.length - 1;
-
-  /* The scale bar in stage points. 313 is box[2] of viewport-field-{s}, and
-     the same unit top and bottom means the ratio carries the physics. */
-  function barPoints(bar, field) { return 313 * bar / field; }
-
-  /* The shipped bar is 23.05 points. This is the guard on the radius-versus
-     -width confusion above, and the one check in here not to skip. */
-  console.assert(Math.abs(barPoints(1, FIELD_NM * 2) - 23.05) < 0.01,
-                 'scale bar: FIELD_NM is the field radius, not its width');
-
-  /* Where grains sit at the middle two steps, in world units like the
-     particles, so `rad` scales them and a resize costs nothing.
-
-     Its own generator, never sim.rng: one draw from the model's stream
-     would shift every tuned number in this file and nothing on screen would
-     say so. Seeded rather than Math.random, so a screenshot repeats. One
-     array for both stations — same positions, different habits, is the
-     comparison this activity is built on. */
-  var SCATTER = (function () {
-    var s = SEED, out = [];
-    function rnd() { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; }
-    for (var i = 0; i < 240; i++) {
-      var a = rnd() * Math.PI * 2, r = Math.sqrt(rnd()) * 0.94;
-      out.push({ x: Math.cos(a) * r, y: Math.sin(a) * r, rot: rnd() * Math.PI,
-                 aspect: 0.6 + rnd() * 0.8, size: 0.7 + rnd() * 0.6 });
-    }
-    // One grain dead centre, so the box at the second step lands on a grain
-    // rather than in the gap between two, and the third is visibly that
-    // same grain.
-    out[0].x = out[0].y = 0;
-    return out;
-  })();
 
   /* Positions on the bench, not substances. The only permanent thing about
      a station is where it is; what is in the beaker changes. */
@@ -207,20 +119,12 @@
   var SUBSTANCE = {
     nacl: {
       label: 'Sodium chloride', common: 'table salt', formula: 'NaCl',
-      /* Grain size in millimetres, and crystal habit, for the zoom's
-         "one grain" step. ESTIMATES — not measured off the kit bottles.
-         They decide whether that step shows one grain, part of one, or
-         dust, so check them against the real powders before teaching off
-         the picture. Calcium chloride moves most: ice melt is 2-3 mm
-         pellets, a lab granule nearer 0.5. */
-      grain: [0.3, 'cube'],
       breakChance: BUILD.breakChance * 1.1, clouds: false, residue: 'cubes',
       free: 'Dissolved sodium chloride. Part of the solution.',
       recovered: 'Sodium chloride, back out of solution. The same substance you started with.'
     },
     caco3: {
       label: 'Calcium carbonate', common: 'chalk', formula: 'CaCO\u2083',
-      grain: [0.005, 'chunk'],
       // What will not dissolve can still be stirred up into suspension.
       // Never dissolves, so nothing ever comes back out as crystals.
       breakChance: 0, clouds: true, residue: false,
@@ -229,28 +133,24 @@
     },
     sucrose: {
       label: 'Sucrose', common: 'table sugar', formula: 'C\u2081\u2082H\u2082\u2082O\u2081\u2081',
-      grain: [0.5, 'chunk'],
       breakChance: BUILD.breakChance, clouds: false, residue: 'glassy',
       free: 'Dissolved sucrose. Part of the solution.',
       recovered: 'Recovered sucrose. On a real stove, sugar heated past dry browns into caramel, a new substance.'
     },
     nahco3: {
       label: 'Sodium bicarbonate', common: 'baking soda', formula: 'NaHCO\u2083',
-      grain: [0.07, 'chunk'],
       breakChance: BUILD.breakChance * 0.3, clouds: false, residue: 'crystal',
       free: 'Dissolved sodium bicarbonate. Part of the solution.',
       recovered: 'Recovered sodium bicarbonate. Real baking soda heated past dry breaks down into sodium carbonate, a new substance.'
     },
     mgso4: {
       label: 'Magnesium sulfate', common: 'Epsom salts', formula: 'MgSO\u2084',
-      grain: [1.5, 'needle'],
       breakChance: BUILD.breakChance * 0.9, clouds: false, residue: 'needles',
       free: 'Dissolved magnesium sulfate. Part of the solution.',
       recovered: 'Magnesium sulfate, back out of solution. Real crystals often grow as needles.'
     },
     cacl2: {
       label: 'Calcium chloride', common: 'ice melt', formula: 'CaCl\u2082',
-      grain: [2.5, 'chunk'],
       breakChance: BUILD.breakChance * 1.5, clouds: false, residue: 'crystal',
       free: 'Dissolved calcium chloride. Dissolving it releases thermal energy, so a real beaker warms up.',
       recovered: 'Recovered calcium chloride. A real sample pulls water from the air and stays damp.'
@@ -342,16 +242,8 @@
 
   var IDENTITY = {
     'particle-water':      ['Water particle', 'Water, the solvent. Constantly moving and colliding.'],
-    /* Both are rewritten by setZoom as the chain is stepped; these are the
-       values for its last link, where the instrument spends its working
-       life. The viewport's old line claimed a magnification, which is not a
-       property of this instrument at all: `fit` sizes the stage from the
-       window, so the same page is about 2.8 million times on a Chromebook
-       and 22 million on the projector. A field width is a property of the
-       model and never changes. Salt is the yardstick rather than the
-       specimen, so the line holds whichever of the six is loaded. */
     'scalebar':  ['Scale bar', '1 nanometre, one billionth of a metre.'],
-    'viewport':  ['Viewport', '13.6 nanometres across — it would take 22,000 of these to cross one grain of table salt.'],
+    'viewport':  ['Viewport', '13.6 nanometres across — 22,000 of these would cross one grain of table salt.'],
     'register':  ['Register', 'Particles dissolved. One light per particle.'],
     'counter':   ['Counter', 'Particles dissolved, out of ' + SOLUTE + '.'],
     'heat':      ['Water temperature', 'Hotter water is faster particles, so they hit the solid harder and more often.'],
@@ -442,10 +334,6 @@
           solute:  { base: v('--p-' + key), lit: v('--p-' + key + '-lit'),
                      dim: v('--p-' + key + '-dim') }
         },
-        /* The macro links of the zoom chain. See --powder in the stylesheet:
-           colour per substance is a convention the particle view needs and
-           a claim about appearance that 10 mm cannot support. */
-        powder: { base: v('--powder'), lit: v('--powder-lit'), dim: v('--powder-dim') },
         bg: v('--lens-bg'),
         hair: v('--lens-hair'),
         rim: v('--lens-hair'),
@@ -688,11 +576,6 @@
   var state = 'loaded';
   var stateT = 0;           // seconds in the current state
 
-  /* Which link of the magnification chain both viewports are showing. It
-     starts at the beaker, so a student's first sight of the field is not a
-     field — which is the whole reason this exists. */
-  var zoom = 0;
-
   /* What the notebook needs to know about a run, and nothing else keeps.
      All three are cleared when a fresh run starts, not when one ends, so a
      student reading the beakers after a boil still sees the run's numbers. */
@@ -778,7 +661,11 @@
       plate.querySelector('.plate__formula').textContent = SUBSTANCE[key].formula;
     }
 
-    labelField(st);           // the one writer; it knows the zoom as well
+    var canvas = $('lens-' + st.key);
+    if (canvas) {
+      canvas.setAttribute('aria-label', 'Magnified view of ' +
+        SUBSTANCE[key].label.toLowerCase() + ' in water');
+    }
     paintPile(st);
     st.lens.resize();          // re-reads the palette, so the field recolours
   }
@@ -885,12 +772,8 @@
     notebook = new Notebook({ root: $('notebook'), bus: bus, say: say, labels: labels });
 
     inst.onResize = resize;
-    identify(null);           // the readout starts at its default, not blank
-    /* Before the first paint, so the scale bar is never caught reading a
-       nanometre over a picture of a beaker — and after the default above,
-       because the first thing worth reading is what the glass is showing. */
-    setZoom(0);
     resize();
+    identify(null);           // the readout starts at its default, not blank
     enter('loaded');
     requestAnimationFrame(loop);
 
@@ -924,7 +807,6 @@
       sims: stations,
       read: function () {
         var out = { state: state, stateT: +stateT.toFixed(3), frozen: frozen,
-                    zoom: zoom,
                     boil: +boilShown || 0,
                     clock: $('clock').textContent, stations: {} };
         STATIONS.forEach(function (k) {
@@ -1142,24 +1024,6 @@
       setTemp(next == null ? HEAT_MARKS[0] : next);
       return;
     }
-    /* Z steps the magnification chain and wraps, so the whole thing can be
-       replayed for the next class without reloading. No keycap: the three
-       -controls-at-rest budget is spent, and the viewport itself is the
-       affordance a student finds without being told.
-
-       Only while the beakers are dry, the same gate a sample swap has and
-       for a harder reason. Once water is in, the dry canvas is hidden and
-       the live field is what you are looking at, so stepping out would
-       leave the scale bar reading 1 mm over the model and would silently
-       stop every particle identifying itself — particleAt answers nothing
-       below the last link. */
-    if (e.key === 'z' || e.key === 'Z') {
-      e.preventDefault();
-      if (state === 'loaded' || state === 'resetting') {
-        setZoom((zoom + 1) % ZOOM.length);
-      }
-      return;
-    }
     var hit = { ' ': keys.freeze, s: keys.stir, S: keys.stir, r: keys.reset,
                 R: keys.reset, w: keys.dispense, W: keys.dispense }[e.key];
     if (!hit) return;
@@ -1191,11 +1055,6 @@
     }
 
     if (next === 'filling') {
-      /* Water arriving means the chain is over: whatever step a student is
-         on, the field they now need is the model. Deliberately not done for
-         `resetting`, so swapping the sample keeps the zoom and the crystal
-         habit visibly changes under it. */
-      if (zoom < LAST) setZoom(LAST);
       keys.dispense.set(true);
       keys.dispense.enable(false);
       /* Every run starts from the same field, however the last one ended —
@@ -1702,399 +1561,6 @@
     return 'polygon(' + pts.join(',') + ')';
   }
 
-  /* ---- the zoom ---------------------------------------------------------
-
-     Drawn rather than painted. `drawDry` re-reads the palette every frame,
-     so grains follow the theme and all six substances for free; six painted
-     steps would have been twenty-four files and a placeholder fallback.
-
-     Nothing in here reads st.sim. The model is not involved in any of it,
-     and SCATTER has its own generator, so no draw can shift the stream. */
-
-  var NONE = [];            // drawDry's particle loop, switched off
-
-  /* Two surfaces, because the field is only about 240 CSS px across and a
-     teaching sentence will not fit in the bottom of a circle that size.
-     Three or four words go on the glass; the sentence goes in the readout,
-     which is 512 points wide and is the instrument's own text surface.
-
-     How much of a grain the view holds is the one thing that depends on
-     the powder: a grain of Epsom salts overruns the frame and chalk is
-     dust, so "one grain" over either would be the lie the zoom exists to
-     correct. */
-  function howMuch(st) {
-    /* Against the frame, not against a guess: `one` only once the grain
-       very nearly fills the field, because a grain at a third of the width
-       means eight of them on screen. */
-    var frac = sub(st).grain[0] * MM / ZOOM[zoom].field;
-    return frac >= 1.15 ? 'part'
-         : frac >= 0.55 ? 'one'
-         : frac >= 0.12 ? 'few'
-         : frac >= 0.02 ? 'heap' : 'dust';
-  }
-
-  function capFor(st) {
-    var z = ZOOM[zoom];
-    if (z.cap !== null) return z.cap;
-    var much = howMuch(st);
-    return much === 'part' ? 'Part of one grain'
-         : much === 'one'  ? 'One grain'
-         : much === 'few'  ? 'A few grains'
-         : much === 'heap' ? 'A heap of grains'
-         : 'Dust';
-  }
-
-  function viewLine(st, spoken) {
-    var z = ZOOM[zoom];
-    if (z.viewDesc !== null) return z.viewDesc;
-
-    var q = sub(st), low = q.label.toLowerCase();
-    var much = howMuch(st);
-    var size = mmText(q.grain[0], spoken);
-    // What the live field will be, as a fraction of one grain of this powder.
-    var next = 'The next view is 1/' + round2(q.grain[0] * MM / (FIELD_NM * 2));
-
-    if (much === 'part') {
-      return 'Part of one grain of ' + low + ', ' + size + '. ' + next + ' of it.';
-    }
-    if (much === 'one') {
-      return 'One grain of ' + low + ', ' + size + ' across. ' + next + ' of it.';
-    }
-    if (much === 'dust') {
-      return q.label + ' dust, ' + size + ' a grain. ' + next + ' of one.';
-    }
-    return (much === 'few' ? 'A few grains of ' : 'A heap of grains of ') +
-           low + ', ' + size + ' each. ' + next + ' of one.';
-  }
-
-  /* The one line on screen telling a student what to do, which is what the
-     one-screen rule asks for and this activity has never had. It names both
-     ways in, because the tap is the one a student finds and the key is the
-     one a student on a keyboard needs — without it they would meet the
-     beaker at boot, have no way forward, and press Dispense straight past
-     the whole chain. It goes once the chain is done. */
-  function withHint(line) {
-    return zoom === 0 ? line + ' Tap it or press Z to zoom in.' : line;
-  }
-
-  /* The readout is a fixed plate that clips after about eighty-eight
-     characters of prose, so it gets the abbreviation; the field's
-     accessible name has no such limit and a screen reader should not be
-     left to make something of "µm". Measured, not guessed. */
-  function mmText(mm, spoken) {
-    return mm < 0.1
-      ? Math.round(mm * 1000) + (spoken ? ' micrometres' : ' µm')
-      : mm + (spoken ? ' millimetres' : ' mm');
-  }
-
-  /* 22091 reads as 22,000. The size is the point, the digits are not, and
-     the grain figures they come from are estimates anyway. */
-  function round2(n) {
-    var r = n < 1000 ? Math.round(n / 10) * 10 : Math.round(n / 1000) * 1000;
-    return r.toLocaleString('en-US');
-  }
-
-  /* One writer for the field's accessible name. The substance and the
-     magnification both belong in it, and two writers would drift. */
-  function labelField(st) {
-    var canvas = $('lens-' + st.key);
-    if (!canvas) return;
-    canvas.setAttribute('aria-label', zoom === LAST
-      ? 'Magnified view of ' + sub(st).label.toLowerCase() + ' in water'
-      : withHint(viewLine(st, true)) + ' Sample: ' + sub(st).label.toLowerCase() + '.');
-  }
-
-  /* Stepping the chain. Both stations always, never one: they are one
-     instrument at one magnification, and the fair test the whole activity
-     rests on needs them to agree about scale. */
-  function setZoom(n) {
-    zoom = n;
-    var z = ZOOM[n];
-
-    STATIONS.forEach(function (k) {
-      var st = stations[k];
-      var wrap = st.dry.parentNode;
-      var label = wrap.querySelector('.scalebar__label');
-      var bar = wrap.querySelector('.scalebar__bar');
-      if (label) label.textContent = z.barLabel;
-      if (bar) {
-        bar.style.setProperty('--nm-bar',
-          barPoints(z.bar, z.field).toFixed(2) + 'px');
-      }
-      labelField(st);
-    });
-
-    /* IDENTITY is read at hover time, so writing it is how the readout
-       follows the zoom. The viewport's line stays substance-free: the key
-       is shared by both stations and they hold different powders. */
-    IDENTITY.scalebar = ['Scale bar', z.barDesc];
-    /* One key, two stations, and at the "one grain" step they can hold
-       powders that fill the frame very differently — so the shared entry
-       takes the left station's wording and the readout follows whichever
-       field the pointer is actually over. */
-    IDENTITY.viewport = ['Viewport', withHint(viewLine(stations.left))];
-
-    /* The readout is where the sentence lives, and nothing is being
-       hovered when a key steps the chain, so point it at the viewport
-       itself. This is the instrument's own text surface doing the job the
-       glass is too small for. */
-    identify('viewport');
-
-    var l = withHint(viewLine(stations.left, true));
-    var r = withHint(viewLine(stations.right, true));
-    /* Forced: the announcer's four-second gap would eat three of the four
-       steps from a student tapping straight through. */
-    say(l === r ? l : 'Left: ' + l + ' Right: ' + r, true);
-  }
-
-  function drawZoom(g, st, cx, cy, rad, pal) {
-    var z = ZOOM[zoom];
-    if (zoom === 0) beakerSchematic(g, st, cx, cy, rad, pal);
-    else grainField(g, st, cx, cy, rad, pal, z);
-
-    /* Where the next view comes from, the idiom every powers-of-ten diagram
-       uses. It exists at the first two steps and cannot exist at the third:
-       13.58 nm inside four tenths of a millimetre is a hundredth of a
-       point — a jump of 29,455 against the tidy tens above it. That
-       impossibility is the lesson, so the caption says it instead. */
-    if (z.reticleAt) {
-      var side = 2 * rad * (ZOOM[zoom + 1].field / z.field);
-      reticle(g, cx + z.reticleAt[0] * rad, cy + z.reticleAt[1] * rad,
-              side, pal.reticle || '#fff');
-    }
-  }
-
-  /* A diagram, deliberately not a picture: the real beaker is on the bench
-     two hundred points to the left and a canvas near-match would lose to it
-     every time. Its job is to hold the box showing where the next view
-     comes from. The rim runs off the top of the circular field, which is
-     what a round aperture does to something this size. */
-  function beakerSchematic(g, st, cx, cy, rad, pal) {
-    var bw = 1.4 * rad, bh = 1.36 * rad;       // 70 mm wide in a 100 mm field
-    /* Lifted a tenth of the radius so the base clears the caption. The rim
-       runs off the top of the circle instead, which is what a round
-       aperture does to something this size and reads as it should. */
-    var lift = rad * 0.1;
-    var x = cx - bw / 2, top = cy - bh / 2 - lift, base = cy + bh / 2 - lift;
-
-    g.save();
-    /* Drawn in the reticle's own white rather than --lens-hair, which at
-       #2A3E57 on a #0F1D2E field is invisible at arm's length on a
-       classroom projector. This is a diagram on the glass, and it should
-       read as one. */
-    g.lineWidth = Math.max(1.5, rad * 0.018);
-    g.strokeStyle = pal.reticle || '#fff';
-    g.globalAlpha = 0.5;
-    g.beginPath();
-    g.moveTo(x, top);
-    g.lineTo(x, base);
-    g.lineTo(x + bw, base);
-    g.lineTo(x + bw, top);
-    g.stroke();
-
-    /* Whatever is actually in the beaker, so the schematic cannot disagree
-       with the bench three hundred points away. */
-    if (st.level > 0.01) {
-      g.globalAlpha = 0.22;
-      g.fillStyle = pal.kinds.solvent.base;
-      var surface = base - bh * 0.78 * st.level;
-      g.fillRect(x, surface, bw, base - surface);
-      g.globalAlpha = 0.7;
-      g.beginPath();
-      g.moveTo(x, surface);
-      g.lineTo(x + bw, surface);
-      g.stroke();
-    }
-
-    // The mound: the only part of this a student is being pointed at.
-    g.globalAlpha = 1;
-    g.fillStyle = pal.powder.base;    // the same white heap the real beaker shows
-    var mw = bw * 0.54, mh = bh * 0.1 * Math.max(0.15, st.pileAt);
-    g.beginPath();
-    g.moveTo(cx - mw / 2, base);
-    g.quadraticCurveTo(cx, base - mh * 2.2, cx + mw / 2, base);
-    g.fill();
-    g.restore();
-  }
-
-  /* Packed grains on a jittered grid pitched to the grain itself, so the
-     field is as densely covered at 10 mm as at 1 mm with no per-step count
-     to tune. SCATTER supplies the jitter, indexed rather than drawn from,
-     so it is the same powder every load. */
-  function grainField(g, st, cx, cy, rad, pal, z) {
-    var q = sub(st);
-    var k = pal.powder;                            // white, whichever powder
-    var span = 2 * q.grain[0] * MM / z.field;      // grain width, world units
-    var px = span * rad;
-
-    /* Finer than a pixel and a half is not a grain any more, it is dust —
-       which is exactly what chalk is at these scales, and what makes it
-       cloud water. Forty thousand sub-pixel dots would say the same thing
-       far more slowly, and grainOver's noise lands on top either way. */
-    if (px < 1.6) {
-      g.fillStyle = k.dim || k.base;
-      g.fillRect(cx - rad, cy - rad, rad * 2, rad * 2);
-      return;
-    }
-
-    /* Bigger than the frame: one grain, placed so an edge crosses the field
-       rather than filling it flat. Without that, a 2.5 mm pellet and 5 um
-       dust are the same picture. */
-    if (span > 1.7) {
-      var off = (span / 2 - 0.5) * 0.72;
-      blob(g, cx - off * rad, cy - off * rad, px, 0.42, 1, q.grain[1], k);
-      return;
-    }
-
-    // The same shove the heap gets, so a dry stir moves both or neither.
-    var shove = rad * dryShove() * 0.05;
-    var pitch = px * 1.04;
-    var half = Math.ceil(rad / pitch) + 1;
-
-    /* Past about six pixels a grain the grid runs to thousands of cells,
-       and what it would draw is dust anyway — so hand it to the flat fill
-       above rather than paint 6,000 specks twice a frame. */
-    if ((2 * half + 1) * (2 * half + 1) > 1500) {
-      g.fillStyle = k.dim || k.base;
-      g.fillRect(cx - rad, cy - rad, rad * 2, rad * 2);
-      return;
-    }
-
-    for (var iy = -half; iy <= half; iy++) {
-      for (var ix = -half; ix <= half; ix++) {
-        /* The middle one is drawn last, below, so a larger neighbour
-           cannot paint over the grain the previous step's box was
-           pointing at — it is the one the student came here to see. */
-        if (ix === 0 && iy === 0) continue;
-
-        /* Keyed to the cell, not to a running count, so a grain keeps its
-           shape when the window resizes and the grid grows around it. */
-        var j = SCATTER[(((iy + 64) * 131 + (ix + 64)) >>> 0) % SCATTER.length];
-        var gx = cx + ix * pitch + j.x * pitch * 0.34 + shove;
-        var gy = cy + iy * pitch + j.y * pitch * 0.34;
-        var dx = gx - cx, dy = gy - cy;
-        if (dx * dx + dy * dy > (rad + px) * (rad + px)) continue;
-        blob(g, gx, gy, px * j.size, j.rot, j.aspect, q.grain[1], k);
-      }
-    }
-
-    // SCATTER[0] carries no jitter, so this one sits dead centre.
-    blob(g, cx + shove, cy, px * SCATTER[0].size, SCATTER[0].rot,
-         SCATTER[0].aspect, q.grain[1], k);
-  }
-
-  /* One grain. Three habits cover six substances because at these scales
-     size does most of the work — a 5 um chunk is dust whatever shape you
-     give it — and the two the FOSS I-Check names are the cube and the
-     needle. */
-  function blob(g, x, y, d, rot, aspect, habit, k) {
-    var r = d / 2;
-
-    /* Below a few pixels every facet is invisible and only the cost is
-       real. Hundreds of these are on screen at the wider steps. */
-    if (d < 5) {
-      g.fillStyle = k.base;
-      g.fillRect(x - r, y - r, d, d);
-      return;
-    }
-
-    g.save();
-    g.translate(x, y);
-    g.rotate(rot);
-    g.fillStyle = k.base;
-
-    if (habit === 'cube') {
-      g.fillRect(-r, -r * aspect, d, d * aspect);
-      g.fillStyle = k.lit;                    // a lit face, or it is a square
-      g.fillRect(-r, -r * aspect, d, d * aspect * 0.32);
-    } else if (habit === 'needle') {
-      g.fillRect(-r, -r * 0.2, d, d * 0.2);
-      g.fillStyle = k.lit;
-      g.fillRect(-r, -r * 0.2, d, d * 0.07);
-    } else {
-      g.beginPath();
-      g.ellipse(0, 0, r, r * aspect, 0, 0, Math.PI * 2);
-      g.fill();
-      g.fillStyle = k.lit;
-      g.beginPath();
-      g.ellipse(-r * 0.2, -r * 0.26, r * 0.48, r * aspect * 0.4, 0, 0, Math.PI * 2);
-      g.fill();
-    }
-    g.restore();
-  }
-
-  // Corners rather than a closed box, which would hide the grain inside it.
-  function reticle(g, x, y, side, ink) {
-    var h = side / 2, arm = side * 0.32;
-    var w = Math.max(1, side * 0.045);
-
-    g.save();
-    g.beginPath();
-    for (var i = 0; i < 4; i++) {
-      var sx = (i === 1 || i === 2) ? 1 : -1;
-      var sy = i < 2 ? -1 : 1;
-      g.moveTo(x + sx * h - sx * arm, y + sy * h);
-      g.lineTo(x + sx * h, y + sy * h);
-      g.lineTo(x + sx * h, y + sy * h - sy * arm);
-    }
-    /* Twice: a dark stroke under a light one. The field behind this is a
-       beaker on near-black at one step and a wall of near-white grains at
-       the next, and a single colour vanishes into one or the other. */
-    g.lineCap = 'round';
-    g.strokeStyle = 'rgba(0,0,0,.55)';
-    g.lineWidth = w * 2.6;
-    g.stroke();
-    g.strokeStyle = ink;
-    g.lineWidth = w;
-    g.stroke();
-    g.restore();
-  }
-
-  /* On the glass rather than in the DOM: no CSS, no print rule, no z-index
-     to get wrong, it cannot escape the cover glass, and it scales with the
-     stage like the reticle it belongs to. A screen reader is served by the
-     field's aria-label and by say(), not by this. */
-  function zoomCaption(g, st, cx, cy, rad, pal) {
-    var text = capFor(st);
-    if (!text) return;
-
-    var size = rad * 0.115;
-    var baseY = cy + rad * 0.84;        // clear of the beaker's base line
-
-    g.save();
-    g.beginPath();
-    g.arc(cx, cy, rad, 0, Math.PI * 2);
-    g.clip();
-    g.font = '600 ' + size.toFixed(2) + 'px ' + (pal.font || 'sans-serif');
-
-    /* A chord, not the diameter: this far down the circle there is much
-       less than 2r to write on, and the refit is what stops a longer
-       substance name running out through the glass. */
-    var dy = (baseY - cy) / rad;
-    var room = 2 * rad * Math.sqrt(Math.max(0.05, 1 - dy * dy)) - size;
-    var wide = g.measureText(text).width;
-    if (wide > room) {
-      size *= room / wide;
-      g.font = '600 ' + size.toFixed(2) + 'px ' + (pal.font || 'sans-serif');
-      wide = g.measureText(text).width;
-    }
-
-    g.textAlign = 'center';
-    g.textBaseline = 'alphabetic';
-
-    /* Its own plate, the way the scale bar has one, hugging the text so
-       its corners cannot reach the rim: white on whatever the field
-       happens to be is unreadable at one theme or the other. */
-    g.fillStyle = pal.bg;
-    g.globalAlpha = 0.95;
-    g.fillRect(cx - wide / 2 - size * 0.4, baseY - size * 0.95,
-               wide + size * 0.8, size * 1.32);
-    g.globalAlpha = 1;
-    g.fillStyle = '#fff';
-    g.fillText(text, cx, baseY);
-    g.restore();
-  }
-
   /* The dry state, and the pour.
 
      The engine expects a field already full of water, so while the beaker is
@@ -2135,13 +1601,7 @@
     g.fillStyle = pal.bg;
     g.fillRect(0, 0, w, h);
 
-    /* The zoomed-out links of the chain are not the model, so they are not
-       particles: a beaker, or a field of grains. Same clip, same grain
-       overlay, same optics — only the subject changes, and the loop below
-       is handed nothing to draw. */
-    if (zoom < LAST) drawZoom(g, st, cx, cy, rad, pal);
-
-    var p = zoom < LAST ? NONE : st.sim.particles;
+    var p = st.sim.particles;
     for (var i = 0; i < p.length; i++) {
       var q = p[i];
       var sprite = st.lens.sprites[q.kind];
@@ -2195,7 +1655,6 @@
        instrument, and they vanish every time this frame comes up — which is
        every state but one. */
     st.lens.optics(g, cx, cy, rad, w, h);
-    if (zoom < LAST) zoomCaption(g, st, cx, cy, rad, pal);
   }
 
   /* ---- particles are identifiable too ----------------------------------- */
@@ -2215,10 +1674,6 @@
       });
 
       canvas.addEventListener('click', function (e) {
-        /* Inward only, and never wrapping: a student poking between
-           particles at the last step must not be thrown back to the
-           beaker. Z is the key that cycles. */
-        if (zoom < LAST) { setZoom(zoom + 1); return; }
         var hit = particleAt(st, e.clientX, e.clientY);
         if (!hit) return;
         identify(nameFor(st, hit.p));
@@ -2239,11 +1694,6 @@
   }
 
   function particleAt(st, clientX, clientY) {
-    /* Nothing on the glass is a particle until the chain reaches the model.
-       Without this, hovering a grain at the hand-lens step names a sodium
-       chloride particle that is nowhere on screen, and the readout lies
-       about the very thing the zoom is there to correct. */
-    if (zoom < LAST) return null;
     var rect = st.dry.getBoundingClientRect();
     if (!rect.width) return null;
 

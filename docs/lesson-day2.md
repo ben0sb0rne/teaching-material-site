@@ -23,7 +23,7 @@ simulation — where they can see the particles.
 
 | | |
 |---|---|
-| 0–5 min | Projector. The ball is a water particle, the bricks are surface particles, an unbreakable level is calcium carbonate. Then step the viewport out to the beaker and back in, on the board, so the class walks the magnification chain together before anyone opens a Chromebook. |
+| 0–5 min | Projector. The ball is a water particle, the bricks are surface particles, an unbreakable level is calcium carbonate. |
 | 5–9 min | Students check their real well tray from Day 1. |
 | 9–27 min | **Lab** tab: the wet lab again, in the sim. |
 | 27–36 min | **Explain** tab, then a table argument over the claim. |
@@ -48,63 +48,6 @@ while the beakers are dry to change the sample.
 The dissolving rates are **targets for the order a student sees, not physics**.
 They want measuring on the shipping seed before anyone teaches off the numbers.
 
-## The magnification chain
-
-The posttests showed students reading the viewport as **one grain of salt**. It
-is not: the field is **13.6 nm across**, and a grain of table salt is about
-0.3 mm, so one grain is roughly **22,000 of these views wide**.
-
-So the viewport opens on the beaker and steps inward. Tap the field, or press
-**Z**; the readout names each step, and once water goes in the chain is over
-and the key is refused.
-
-| Step | What it is | Field | Scale bar |
-|---|---|---|---|
-| 1 | The beaker, as your eyes see it | 100 mm | 10 mm |
-| 2 | Grains of powder, through a hand lens | 10 mm | 1 mm |
-| 3 | One grain, under a microscope | 0.4 mm | 0.1 mm |
-| 4 | Inside one grain — **a model** | 13.6 nm | 1 nm |
-
-Two things in that table are worth pointing at in class.
-
-**The bar runs in clean decades and the field does not.** 10 mm, 1 mm, 0.1 mm:
-the bar barely changes length while the number on it falls ten-fold each step.
-The third field is 0.4 mm rather than a tidy 1 mm because that is what puts one
-grain of salt — the lesson's reference case — in the frame. At 1 mm it was
-eight grains with "One grain" written under them.
-
-**Step 3 shows no box for step 4, and that is the lesson.** Each step draws a
-box where the next view comes from. The first two are easy. From 0.4 mm to
-13.6 nm is a jump of **29,455**, and that box would be one hundredth of a
-point across — it cannot be drawn at all. So the readout says the number
-instead: *the next view is 1/22,000 of it.*
-
-Step 4 is also where colour appears. The powder is drawn white at every real
-magnification, because all six are white in the hand; the per-substance hues
-are a convention the particle view needs and a claim nothing above it can
-support.
-
-### What each powder shows
-
-Shape and size are the only things telling the six apart, which is the lesson's
-own point — and the hand-lens step is where it lands. **Epsom salts resolves
-into needles there**, which is exactly the cue the FOSS I-Check asks a student
-to identify.
-
-| Sample | Grain | Hand lens (10 mm) | Grain step (0.4 mm) |
-|---|---|---|---|
-| Sodium chloride | 0.3 mm | small cubes | **one grain** |
-| Calcium carbonate | 5 µm | flat dust | dust |
-| Sucrose | 0.5 mm | rounded chunks | part of one grain |
-| Sodium bicarbonate | 70 µm | flat dust | a few grains |
-| Magnesium sulfate | 1.5 mm | **needles** | part of one grain |
-| Calcium chloride | 2.5 mm | large pellets | part of one grain |
-
-Those grain sizes are **estimates, not measurements off the kit bottles**, and
-they decide what step 3 draws. Calcium chloride moves most: ice melt is 2–3 mm
-pellets, a lab granule nearer 0.5 mm. They live in `SUBSTANCE[*].grain` in
-`activity.js` and are six numbers to change.
-
 Two substances from Investigation 1 are deliberately absent: **citric acid and
 ascorbic acid**. Every fizzing pair in Investigation 1 Part 2 needs one of
 them, and this machine holds one substance per beaker, so it can never show a
@@ -127,7 +70,6 @@ the line it writes into that page's Observations.
 
 | Item | Type | Tags |
 |---|---|---|
-| `lab-scale` | choice | Engage · CG5 |
 | `lab-predict` | prediction | Engage · CG2 |
 | `lab-surface` | observe | Explore · CG3 |
 | `lab-dissolved` | observe | Explore · CG2 · CG4 |
@@ -161,7 +103,6 @@ the line it writes into that page's Observations.
 | **CG2** | Dissolving is not a chemical reaction. |
 | **CG3** | Temperature, stirring and particle motion. |
 | **CG4** | Dissolved substances in our water — the environmental science agency goal. |
-| **CG5** | The viewport is a model at particle scale, not a picture of a grain. |
 | **ALD1** | Vocabulary and word roots. |
 | **ALD2** | Argument talk. |
 | **ALD3** | Cause-and-effect sentences. |
@@ -202,15 +143,6 @@ Worth knowing before standing in front of the class.
   Investigation 1 background, which defines a particle as the formula unit.
 - **There is no filter.** `exp-filter` brings in the result from the bench
   instead.
-- **The grain sizes are estimates.** See the table above. They change what the
-  grain step draws and nothing else — no rate, no count, no reading.
-- **Chalk looks the same at both zoomed-out steps.** At 5 µm it is under a
-  pixel either way, so both draw it as flat dust. That is honest — being that
-  fine is why it clouds water rather than settling — but it means the hand-lens
-  step teaches nothing about chalk except that you cannot resolve it.
-- **Printing mid-zoom gives the particle view, not the step on screen.** The
-  canvas the chain draws on is hidden for print, which is right for an absent
-  student and surprising if you are looking at the beaker when you hit print.
 
 ## Running it
 
