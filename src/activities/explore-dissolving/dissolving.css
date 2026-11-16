@@ -20,15 +20,38 @@
 :root {
   /* From the spec's colour table. */
   --p-water:  #5B8FD6;
-  --p-sugar:  #D2603F;
-  --p-caco3:  #E9E4D6;
-  --led-sugar-lit: #FF7A52;
+
+  /* One hue per substance. All six are white powders in the beaker — the
+     colour is a reading aid in the magnified view only, which is why each
+     must stay apart from the others and from water. Colour is never the
+     only cue: the nameplate, the position and the ID readout all say which
+     is which. */
+  --p-nacl:    #8E7CC3;
+  --p-caco3:   #E9E4D6;
+  --p-sucrose: #D2603F;
+  --p-nahco3:  #6FB07A;
+  --p-mgso4:   #C9A227;
+  --p-cacl2:   #D4567C;
+
+  /* The lamp a dissolved particle lights. Kept apart from --p-* because a
+     diode reads brighter than the sphere it stands for; sucrose keeps the
+     value its lamps have always had. */
+  --led-nacl:    #A992E0;
+  --led-caco3:   #E9E4D6;
+  --led-sucrose: #FF7A52;
+  --led-nahco3:  #84D193;
+  --led-mgso4:   #F0C341;
+  --led-cacl2:   #F26A95;
 
   /* Shoulder and terminator for each particle sphere, which the engine
      shades between. Derived from the three above, not new colours. */
   --p-water-lit: #B9D4F5;  --p-water-dim: #22406B;
-  --p-sugar-lit: #FFA98C;  --p-sugar-dim: #7A2E18;
-  --p-caco3-lit: #FFFFFF;  --p-caco3-dim: #8E8878;
+  --p-nacl-lit:    #C9BCEA;  --p-nacl-dim:    #4A3C73;
+  --p-caco3-lit:   #FFFFFF;  --p-caco3-dim:   #8E8878;
+  --p-sucrose-lit: #FFA98C;  --p-sucrose-dim: #7A2E18;
+  --p-nahco3-lit:  #B4DCBB;  --p-nahco3-dim:  #2F5F39;
+  --p-mgso4-lit:   #F2D97A;  --p-mgso4-dim:   #6E5610;
+  --p-cacl2-lit:   #F7A9BF;  --p-cacl2-dim:   #78243C;
 
   /* Boiling. A bubble is a pocket of vapour, so it reads lighter than the
      water it rises through, with a bright cap where the light catches it.
@@ -40,10 +63,7 @@
   --display-ink:   #F4C152;
   --display-soft:  #D9C9A0;
   --display-bezel: #2F3134;
-
-  /* Unlit LEDs: a dim version of the substance colour, per station. */
-  --led-off-sugar: #4B2620;  --led-off-sugar-rim: #5E3027;
-  --led-off-caco3: #3B3B38;  --led-off-caco3-rim: #4C4C48;
+  --plate-ink:     #18191B;   /* engraved on a light plate, not a dark one */
 
   --lens-bg:   #0F1D2E;       /* the dark field inside the viewport */
   --lens-hair: #2A3E57;       /* etched crosshair and barrel ticks */
@@ -302,23 +322,71 @@ body {
 
 .led.is-lit {
   background-image: var(--led-on-img);
-  box-shadow: 0 0 6px var(--led-on), 0 0 14px var(--led-glow);
+  box-shadow: 0 0 6px var(--led-on),
+              0 0 14px color-mix(in srgb, var(--led-on) 55%, transparent);
 }
 
-/* The two image vars are set by instrument.js, so the lamps follow whichever
-   asset set is loaded instead of naming a folder here. */
-[data-station="sugar"] {
-  --led-off-img: var(--img-led-sugar-off);
-  --led-on-img:  var(--img-led-sugar-on);
-  --led-on:  var(--led-sugar-lit);
-  --led-glow: color-mix(in srgb, var(--led-sugar-lit) 55%, transparent);
+/* --led-off-img, --led-on-img and --led-on are written per station by
+   setSubstance, because a station holds whichever of the six it was given
+   and there is no selector for that. They were two hand-written blocks here
+   when a station was a substance. */
+
+/* --------------------------------------------------------------------------
+   The sample plate. It was engraved art, one file per substance; now it is
+   blank art with the name set over it, because a station holds whichever of
+   the six samples it was given and six engraved plates would be six files
+   to keep in step with one table. A real <button>, so it takes a tap at all
+   — the raster rule above kills pointer events on everything that is not —
+   and so Enter and Space work with no key handler.
+   -------------------------------------------------------------------------- */
+
+/* Every number here is lifted off the plate in docs/sketches/01-loaded.svg,
+   so the text sits exactly where it was engraved. --engrave is for lettering
+   on a dark panel; this plate is light, so it wants ink. */
+.plate {
+  display: flex;
+  align-items: center;
+  gap: 13.5px;
+  padding: 0 28px 0 31.5px;
+  border: 0;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  font: 600 27.5px/1 var(--font);
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--plate-ink);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-[data-station="caco3"] {
-  --led-off-img: var(--img-led-caco3-off);
-  --led-on-img:  var(--img-led-caco3-on);
-  --led-on:  var(--p-caco3);
-  --led-glow: color-mix(in srgb, var(--p-caco3) 55%, transparent);
+/* The sample's own colour, so the plate, the lamps and the particles in the
+   viewport agree without a student being told that they do. */
+.plate__dot {
+  flex: none;
+  width: 25px; height: 25px;
+  border-radius: 50%;
+  background: var(--plate-dot, var(--plate-ink));
+  /* The sketch rims the dot in a darkened version of its own fill. One
+     translucent black ring does that for any of the six hues. */
+  box-shadow: inset 0 0 0 2.5px rgb(0 0 0 / .3);
+}
+
+/* SODIUM BICARBONATE is the longest of the six against a 512-wide plate, so
+   the name clips rather than shoving the formula off the end. */
+.plate__name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.plate__formula {
+  margin-left: auto;
+  flex: none;
+  font: 400 20px/1 var(--font);
+  letter-spacing: 0;
+  text-transform: none;         /* CaCl2, not CACL2 */
+  color: var(--display-bezel);
 }
 
 /* --------------------------------------------------------------------------
@@ -350,13 +418,15 @@ body {
   border-radius: 10px;
 }
 
-.key:focus-visible {
+.key:focus-visible,
+.plate:focus-visible {
   outline: none;
 }
 
 /* A lit outline around the cap, which suits an instrument better than a
-   browser focus ring. */
-.key:focus-visible::after {
+   browser focus ring. The plate is focusable too, and wants the same. */
+.key:focus-visible::after,
+.plate:focus-visible::after {
   content: "";
   position: absolute; inset: -3px;
   border: 2.5px solid var(--key-focus);
@@ -800,7 +870,8 @@ body {
     margin-bottom: calc(-1000px * (1 - var(--print-s, .62)));
   }
   .viewport__dry, .layer[data-render="raster-overlay"] { display: none; }
-  .key:focus-visible::after { display: none; }
+  .key:focus-visible::after,
+  .plate:focus-visible::after { display: none; }
 
   /* A browser does not print background colours, so the displays would come
      out as pale amber on bare paper — and the glass rasters that would have

@@ -85,13 +85,25 @@ GRAIN_GAP = 9.0
 WATER_BLUE, WATER_LIT = "#B6C0C7", "#E4EAEE"   # the pour stream
 WATER_TINT = (174, 182, 188)                   # the liquid in the beaker
 WATER_ALPHA = 0.55          # a beaker of water is see-through, not a blue slab
-POWDER = {"sugar": ("#F4F1EA", "#B8B2A5"), "caco3": ("#EFEADC", "#B3AD9E")}
+# The two bench positions. Layer ids end in one of these; substances do not
+# appear in any filename except the lamps.
+STATIONS = ("left", "right")
 
-# Indicator lamps, lit and unlit, per station. Unlit is a dim version of the
-# substance's own colour; lit gets a bright core, and the CSS adds the glow.
+# All six substances are white powders, which is the lesson's own point, so
+# one picture serves every station and every sample.
+POWDER = ("#F4F1EA", "#B8B2A5")
+
+# Indicator lamps, lit and unlit, per SUBSTANCE — a station holds whichever
+# of the six it was given. Unlit is a dim version of the substance's own
+# colour; lit gets a bright core, and the CSS adds the glow. The lit fills
+# match --led-<key> in dissolving.css.
 LED = {
-    "sugar": {"off": ("#4B2620", "#5E3027"), "on": ("#FF7A52", "#FFCDBC")},
-    "caco3": {"off": ("#3B3B38", "#4C4C48"), "on": ("#E9E4D6", "#FFFFFF")},
+    "nacl":    {"off": ("#2F2740", "#413657"), "on": ("#A992E0", "#DCD1F4")},
+    "caco3":   {"off": ("#3B3B38", "#4C4C48"), "on": ("#E9E4D6", "#FFFFFF")},
+    "sucrose": {"off": ("#4B2620", "#5E3027"), "on": ("#FF7A52", "#FFCDBC")},
+    "nahco3":  {"off": ("#22342A", "#2F4737"), "on": ("#84D193", "#C6ECCD")},
+    "mgso4":   {"off": ("#3B3012", "#4E411C"), "on": ("#F0C341", "#FAE49B")},
+    "cacl2":   {"off": ("#401F2A", "#562B39"), "on": ("#F26A95", "#FBB6CB")},
 }
 LED_PT = 15                 # the socket pitch the register panel is drilled for
 
@@ -227,6 +239,17 @@ def fit_to_beaker(dest, tint=None):
     webp(out, dest)
 
 
+def strip_text(group):
+    """The sample plate with no engraving.
+
+    The name is set in code over this, because a station holds whichever
+    of the six samples it was given: engraving it would mean six files to
+    keep in step with one table.
+    """
+    for t in list(q(group, "text")):
+        group.remove(t)
+
+
 def strip_rules(group):
     """Take the ruled lines off the notebook paper.
 
@@ -254,7 +277,13 @@ FIT_TO_BEAKER = {"water", "turbidity"}
 # in beside it later and that one wins.
 SHARED = ("bracket", "head", "stirplate", "beaker", "viewport-ring",
           "register-panel", "water", "turbidity", "glass-viewport",
-          "glass-counter", "sprite-pour", "sprite-stirbar")
+          "glass-counter", "sprite-pour", "sprite-stirbar",
+          # All six substances are white powders, so the heap and the falling
+          # grains are one picture; only the nameplate says which is which.
+          "pile", "sprite-powder",
+          # The plate is blank art with the name set over it in code, so
+          # one file serves both stations and all six samples.
+          "nameplate")
 
 
 def isolate(src, layer_id, box, mutate=None):
@@ -376,18 +405,18 @@ def glass(w, h, dest):
 
 def shared_base(layer_id):
     """The file a layer writes to. Station twins fold onto one name."""
-    bare = re.sub(r"-(sugar|caco3)$", "", layer_id)
+    bare = re.sub(r"-(%s)$" % "|".join(STATIONS), "", layer_id)
     return bare if bare in SHARED else layer_id
 
 
-def led(station, lit, dest):
+def led(substance, lit, dest):
     """One indicator lamp, as the register panel is drilled for it.
 
     Lit gets a hot core falling off to the substance's colour, which is what
     a diode looks like close up; the halo around it belongs to the CSS, so it
     can stay crisp at any scale.
     """
-    fill, rim = LED[station]["on" if lit else "off"]
+    fill, rim = LED[substance]["on" if lit else "off"]
     r, c = 6.3, LED_PT / 2
     body = ('<radialGradient id="g" cx="38%%" cy="34%%" r="72%%">'
             '<stop offset="0" stop-color="#FFFFFF"/>'
@@ -443,7 +472,7 @@ def sprite_sheet(kind, station, box, dest):
             frames.append("".join(parts))
     else:  # powder
         cx = x + w / 2
-        fill, edge = POWDER[station]
+        fill, edge = POWDER
         period = GRAIN_GAP * 2
         for i in range(n):
             shift = i / n * period
@@ -493,7 +522,7 @@ def measure_geometry():
              "rightFrac": round(bbox[2] / img.width, 5)}
         # Both stations draw the same texture, so one file answers to both
         # names — the same fold shared_base() does on the way out.
-        for key in (["water-sugar", "water-caco3"] if f.stem == "water" else [f.stem]):
+        for key in (["water-" + s for s in STATIONS] if f.stem == "water" else [f.stem]):
             geo[key] = v
     if geo:
         dest = OUT / "geometry.json"
@@ -639,10 +668,18 @@ def main():
 
     # Indicator lamps. Not manifest layers — the register is drawn in code —
     # so they are named directly and the CSS reaches for them by name.
-    for station in LED:
+    # The blank sample plate. A "code" row, so the manifest loop skipped it.
+    for s_ in STATIONS:
+        nb = boxes_by_name(manifest)["nameplate-" + s_]
+        add("nameplate-" + s_,
+            lambda out, g="nameplate-" + s_, b=nb:
+                (lambda: render(isolate("01-loaded", g, b, strip_text),
+                                int(b[2] * SCALE), int(b[3] * SCALE), out)))
+
+    for substance in LED:
         for state in ("off", "on"):
-            add("led-%s-%s" % (station, state),
-                lambda out, s=station, lit=(state == "on"): (lambda: led(s, lit, out)))
+            add("led-%s-%s" % (substance, state),
+                lambda out, s=substance, lit=(state == "on"): (lambda: led(s, lit, out)))
 
     print("%d placeholder(s) -> %s" % (len(jobs), OUT.relative_to(ROOT)))
     errors = []

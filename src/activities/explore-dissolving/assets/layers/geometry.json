@@ -1,11 +1,11 @@
 {
-  "water-caco3": {
+  "water-left": {
     "floorFrac": 0.98667,
     "leftFrac": 0.12308,
     "rightFrac": 0.88923,
     "surfaceFrac": 0.2
   },
-  "water-sugar": {
+  "water-right": {
     "floorFrac": 0.98667,
     "leftFrac": 0.12308,
     "rightFrac": 0.88923,

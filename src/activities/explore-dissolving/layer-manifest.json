@@ -143,8 +143,8 @@
     ]
   },
   {
-    "id": "nameplate-sugar",
-    "render": "raster",
+    "id": "nameplate-left",
+    "render": "code",
     "notes": "Engraved aluminum plate, text and colour dot included",
     "box_1x": [
       75,
@@ -154,7 +154,7 @@
     ]
   },
   {
-    "id": "viewport-ring-sugar",
+    "id": "viewport-ring-left",
     "render": "raster",
     "notes": "Metal ring, transparent centre",
     "box_1x": [
@@ -165,7 +165,7 @@
     ]
   },
   {
-    "id": "viewport-field-sugar",
+    "id": "viewport-field-left",
     "render": "code",
     "notes": "Particle simulation canvas (circle, r = 156.5)",
     "box_1x": [
@@ -176,7 +176,7 @@
     ]
   },
   {
-    "id": "glass-viewport-sugar",
+    "id": "glass-viewport-left",
     "render": "raster-overlay",
     "notes": "Lens reflection overlay, placeholder",
     "box_1x": [
@@ -187,7 +187,7 @@
     ]
   },
   {
-    "id": "register-panel-sugar",
+    "id": "register-panel-left",
     "render": "raster",
     "notes": "LED panel with engraved DISSOLVED and 50 LED sockets",
     "box_1x": [
@@ -198,7 +198,7 @@
     ]
   },
   {
-    "id": "register-leds-sugar",
+    "id": "register-leds-left",
     "render": "code",
     "notes": "5 x 10 grid; each LED 15 pt across with 7.5 pt gaps",
     "box_1x": [
@@ -209,7 +209,7 @@
     ]
   },
   {
-    "id": "display-counter-sugar",
+    "id": "display-counter-left",
     "render": "code",
     "notes": "Counter cut-out",
     "box_1x": [
@@ -220,7 +220,7 @@
     ]
   },
   {
-    "id": "glass-counter-sugar",
+    "id": "glass-counter-left",
     "render": "raster-overlay",
     "notes": "Overlay, placeholder",
     "box_1x": [
@@ -231,7 +231,7 @@
     ]
   },
   {
-    "id": "head-sugar",
+    "id": "head-left",
     "render": "raster",
     "notes": "Low-profile head with water nozzle, powder chute and probe",
     "box_1x": [
@@ -242,7 +242,7 @@
     ]
   },
   {
-    "id": "bracket-sugar",
+    "id": "bracket-left",
     "render": "raster",
     "notes": "Metal bracket from console to stir plate",
     "box_1x": [
@@ -253,7 +253,7 @@
     ]
   },
   {
-    "id": "stirplate-sugar",
+    "id": "stirplate-left",
     "render": "raster",
     "notes": "Magnetic stir plate with speed knob",
     "box_1x": [
@@ -264,7 +264,7 @@
     ]
   },
   {
-    "id": "beaker-sugar",
+    "id": "beaker-left",
     "render": "raster",
     "blend": "multiply",
     "notes": "Empty 250 mL beaker glass with graduations (transparent)",
@@ -276,7 +276,7 @@
     ]
   },
   {
-    "id": "refract-sugar",
+    "id": "refract-left",
     "render": "code",
     "notes": "The ground seen through the water, raised",
     "box_1x": [
@@ -287,7 +287,7 @@
     ]
   },
   {
-    "id": "water-sugar",
+    "id": "water-left",
     "render": "raster-masked",
     "notes": "Full beaker of water; code masks it bottom-up",
     "box_1x": [
@@ -298,7 +298,7 @@
     ]
   },
   {
-    "id": "turbidity-sugar",
+    "id": "turbidity-left",
     "render": "raster-masked",
     "notes": "Milky cloud texture inside the water; code sets opacity",
     "box_1x": [
@@ -309,7 +309,7 @@
     ]
   },
   {
-    "id": "pile-sugar",
+    "id": "pile-left",
     "render": "raster-masked",
     "notes": "Powder mound on the beaker floor; code masks it for refills",
     "box_1x": [
@@ -320,7 +320,7 @@
     ]
   },
   {
-    "id": "sprite-stirbar-sugar",
+    "id": "sprite-stirbar-left",
     "render": "sprite",
     "notes": "Stir bar spin loop, 12 frames",
     "box_1x": [
@@ -331,7 +331,7 @@
     ]
   },
   {
-    "id": "sprite-pour-sugar",
+    "id": "sprite-pour-left",
     "render": "sprite",
     "notes": "Water stream loop from nozzle to beaker floor. x puts the painted column under the nozzle bore, not the box under the beaker axis.",
     "box_1x": [
@@ -342,7 +342,7 @@
     ]
   },
   {
-    "id": "sprite-powder-sugar",
+    "id": "sprite-powder-left",
     "render": "sprite",
     "notes": "Powder stream loop from chute to beaker floor. x puts the painted column under the chute bore, not the box under the beaker axis.",
     "box_1x": [
@@ -353,8 +353,8 @@
     ]
   },
   {
-    "id": "nameplate-caco3",
-    "render": "raster",
+    "id": "nameplate-right",
+    "render": "code",
     "notes": "Engraved aluminum plate, text and colour dot included",
     "box_1x": [
       613,
@@ -364,7 +364,7 @@
     ]
   },
   {
-    "id": "viewport-ring-caco3",
+    "id": "viewport-ring-right",
     "render": "raster",
     "notes": "Metal ring, transparent centre",
     "box_1x": [
@@ -375,7 +375,7 @@
     ]
   },
   {
-    "id": "viewport-field-caco3",
+    "id": "viewport-field-right",
     "render": "code",
     "notes": "Particle simulation canvas (circle, r = 156.5)",
     "box_1x": [
@@ -386,7 +386,7 @@
     ]
   },
   {
-    "id": "glass-viewport-caco3",
+    "id": "glass-viewport-right",
     "render": "raster-overlay",
     "notes": "Lens reflection overlay, placeholder",
     "box_1x": [
@@ -397,7 +397,7 @@
     ]
   },
   {
-    "id": "register-panel-caco3",
+    "id": "register-panel-right",
     "render": "raster",
     "notes": "LED panel with engraved DISSOLVED and 50 LED sockets",
     "box_1x": [
@@ -408,7 +408,7 @@
     ]
   },
   {
-    "id": "register-leds-caco3",
+    "id": "register-leds-right",
     "render": "code",
     "notes": "5 x 10 grid; each LED 15 pt across with 7.5 pt gaps",
     "box_1x": [
@@ -419,7 +419,7 @@
     ]
   },
   {
-    "id": "display-counter-caco3",
+    "id": "display-counter-right",
     "render": "code",
     "notes": "Counter cut-out",
     "box_1x": [
@@ -430,7 +430,7 @@
     ]
   },
   {
-    "id": "glass-counter-caco3",
+    "id": "glass-counter-right",
     "render": "raster-overlay",
     "notes": "Overlay, placeholder",
     "box_1x": [
@@ -441,7 +441,7 @@
     ]
   },
   {
-    "id": "head-caco3",
+    "id": "head-right",
     "render": "raster",
     "notes": "Low-profile head with water nozzle, powder chute and probe",
     "box_1x": [
@@ -452,7 +452,7 @@
     ]
   },
   {
-    "id": "bracket-caco3",
+    "id": "bracket-right",
     "render": "raster",
     "notes": "Metal bracket from console to stir plate",
     "box_1x": [
@@ -463,7 +463,7 @@
     ]
   },
   {
-    "id": "stirplate-caco3",
+    "id": "stirplate-right",
     "render": "raster",
     "notes": "Magnetic stir plate with speed knob",
     "box_1x": [
@@ -474,7 +474,7 @@
     ]
   },
   {
-    "id": "beaker-caco3",
+    "id": "beaker-right",
     "render": "raster",
     "blend": "multiply",
     "notes": "Empty 250 mL beaker glass with graduations (transparent)",
@@ -486,7 +486,7 @@
     ]
   },
   {
-    "id": "refract-caco3",
+    "id": "refract-right",
     "render": "code",
     "notes": "The ground seen through the water, raised",
     "box_1x": [
@@ -497,7 +497,7 @@
     ]
   },
   {
-    "id": "water-caco3",
+    "id": "water-right",
     "render": "raster-masked",
     "notes": "Full beaker of water; code masks it bottom-up",
     "box_1x": [
@@ -508,7 +508,7 @@
     ]
   },
   {
-    "id": "turbidity-caco3",
+    "id": "turbidity-right",
     "render": "raster-masked",
     "notes": "Milky cloud texture inside the water; code sets opacity",
     "box_1x": [
@@ -519,7 +519,7 @@
     ]
   },
   {
-    "id": "pile-caco3",
+    "id": "pile-right",
     "render": "raster-masked",
     "notes": "Powder mound on the beaker floor; code masks it for refills",
     "box_1x": [
@@ -530,7 +530,7 @@
     ]
   },
   {
-    "id": "sprite-stirbar-caco3",
+    "id": "sprite-stirbar-right",
     "render": "sprite",
     "notes": "Stir bar spin loop, 12 frames",
     "box_1x": [
@@ -541,7 +541,7 @@
     ]
   },
   {
-    "id": "sprite-pour-caco3",
+    "id": "sprite-pour-right",
     "render": "sprite",
     "notes": "Water stream loop from nozzle to beaker floor. x puts the painted column under the nozzle bore, not the box under the beaker axis.",
     "box_1x": [
@@ -552,7 +552,7 @@
     ]
   },
   {
-    "id": "sprite-powder-caco3",
+    "id": "sprite-powder-right",
     "render": "sprite",
     "notes": "Powder stream loop from chute to beaker floor. x puts the painted column under the chute bore, not the box under the beaker axis.",
     "box_1x": [

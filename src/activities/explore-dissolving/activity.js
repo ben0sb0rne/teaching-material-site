@@ -69,13 +69,23 @@
   var NM_FRACTION = 1 / FIELD_NM;
   var DURATION = 3600;     // 60 seconds at 60 frames a second
 
-  var STATIONS = ['sugar', 'caco3'];
+  /* Positions on the bench, not substances. The only permanent thing about
+     a station is where it is; what is in the beaker changes. */
+  var STATIONS = ['left', 'right'];
+
+  // The lab's first comparison, so the machine opens on what the class did.
+  var STARTS = { left: 'nacl', right: 'caco3' };
+
+  /* The order the nameplate steps through. Salt and chalk first because they
+     are the pair every group tested. */
+  var CYCLE = ['nacl', 'caco3', 'sucrose', 'nahco3', 'mgso4', 'cacl2'];
 
   /* Solubility is one number: the chance a hard enough collision frees a
      surface particle. Insoluble is the same rule with a chance of zero — it
      gets hit just as often and never lets go.
 
-     It lives on BUILD because it is not a property of sugar, it is whatever
+     It lives on BUILD because it is not a property of the substance, it is
+     whatever
      holds the pace a student sees given how often the pile is being hit.
      Re-measure it whenever the field size, the particle sizes, the water
      count or the collision model moves.
@@ -92,11 +102,69 @@
      66 to 142 seconds at a single breakChance — the first forty are steady,
      the last ten are luck. 0.05 is the value that lands the steady part on
      the to-scale build's curve. */
+  /* The six white powders from Investigation 1. They look identical in the
+     beaker, which is the lesson's own point: what tells them apart is how
+     they behave, not how they look.
+
+     `breakChance` is a target for the ORDER a student sees, not physics —
+     calcium chloride fastest, sodium bicarbonate slowest of the soluble
+     ones, calcium carbonate never. Measure each on the shipping seed the way
+     the BUILD comment describes and record the curves before trusting them.
+
+     `recovered` is what a particle says after a boil has driven it back out
+     of solution, and it is where the honest caveats live: the model puts
+     every substance back unchanged, and three of these really would not come
+     back the same. */
   var SUBSTANCE = {
-    sugar: { label: 'Sugar', breakChance: BUILD.breakChance, clouds: false },
-    // What will not dissolve can still be stirred up into suspension.
-    caco3: { label: 'Calcium carbonate', breakChance: 0, clouds: true }
+    nacl: {
+      label: 'Sodium chloride', common: 'table salt', formula: 'NaCl',
+      breakChance: BUILD.breakChance * 1.1, clouds: false,
+      free: 'Dissolved sodium chloride. Part of the solution.',
+      recovered: 'Sodium chloride, back out of solution. The same substance you started with.'
+    },
+    caco3: {
+      label: 'Calcium carbonate', common: 'chalk', formula: 'CaCO\u2083',
+      // What will not dissolve can still be stirred up into suspension.
+      breakChance: 0, clouds: true,
+      pile: 'Calcium carbonate, the main ingredient in chalk. Insoluble in water.',
+      recovered: 'Calcium carbonate. It never dissolved, so nothing had to come back.'
+    },
+    sucrose: {
+      label: 'Sucrose', common: 'table sugar', formula: 'C\u2081\u2082H\u2082\u2082O\u2081\u2081',
+      breakChance: BUILD.breakChance, clouds: false,
+      free: 'Dissolved sucrose. Part of the solution.',
+      recovered: 'Recovered sucrose. On a real stove, sugar heated past dry browns into caramel, a new substance.'
+    },
+    nahco3: {
+      label: 'Sodium bicarbonate', common: 'baking soda', formula: 'NaHCO\u2083',
+      breakChance: BUILD.breakChance * 0.3, clouds: false,
+      free: 'Dissolved sodium bicarbonate. Part of the solution.',
+      recovered: 'Recovered sodium bicarbonate. Real baking soda heated past dry breaks down into sodium carbonate, a new substance.'
+    },
+    mgso4: {
+      label: 'Magnesium sulfate', common: 'Epsom salts', formula: 'MgSO\u2084',
+      breakChance: BUILD.breakChance * 0.9, clouds: false,
+      free: 'Dissolved magnesium sulfate. Part of the solution.',
+      recovered: 'Magnesium sulfate, back out of solution. Real crystals often grow as needles.'
+    },
+    cacl2: {
+      label: 'Calcium chloride', common: 'ice melt', formula: 'CaCl\u2082',
+      breakChance: BUILD.breakChance * 1.5, clouds: false,
+      free: 'Dissolved calcium chloride. Dissolving it releases thermal energy, so a real beaker warms up.',
+      recovered: 'Recovered calcium chloride. A real sample pulls water from the air and stays damp.'
+    }
   };
+
+  // What a station currently holds, which is the only thing that varies.
+  function sub(st) { return SUBSTANCE[st.substance]; }
+
+  /* The lamp art the register reaches for by name: one pair per substance,
+     because a station holds whichever of the six it was given. The
+     instrument publishes these as --img-* so the CSS never names a folder. */
+  var LAMPS = [];
+  Object.keys(SUBSTANCE).forEach(function (k) {
+    LAMPS.push('led-' + k + '-off', 'led-' + k + '-on');
+  });
 
   /* ---- timings, in seconds (spec 6.2 and 6.5) --------------------------- */
 
@@ -172,9 +240,6 @@
 
   var IDENTITY = {
     'particle-water':      ['Water particle', 'Water, the solvent. Constantly moving and colliding.'],
-    'particle-sugar-pile': ['Sugar particle', 'Sugar, the solute. Held in the pile by attraction to other sugar particles.'],
-    'particle-sugar-free': ['Sugar particle', 'Dissolved sugar. Part of the solution.'],
-    'particle-caco3':      ['Calcium carbonate particle', 'Calcium carbonate, the main ingredient in chalk. Insoluble in water.'],
     'scalebar':  ['Scale bar', '1 nanometre, one billionth of a metre.'],
     'viewport':  ['Viewport', 'Magnified tens of millions of times.'],
     'register':  ['Register', 'Particles dissolved. One light per particle.'],
@@ -185,8 +250,6 @@
     'stir':      ['Stir', 'Spins the stir bars in both beakers.'],
     'reset':     ['Reset', 'Drains both beakers and adds fresh samples.'],
     'dispense':  ['Dispense water', 'Adds 250 mL of water to both beakers at once.'],
-    'nameplate-sugar': ['Sugar', 'Sugar, C₁₂H₂₂O₁₁.'],
-    'nameplate-caco3': ['Calcium carbonate', 'Calcium carbonate, CaCO₃.'],
     'beaker':    ['Beaker', '250 mL beaker.'],
     'stirbar':   ['Stir bar', 'Magnetic stir bar. Spins when the stir plate is on.'],
     'stirplate': ['Stir plate', 'Magnetic stir plate. Spins the stir bar from below.'],
@@ -197,11 +260,25 @@
     'head':      ['Sample head', 'Carries the water nozzle, the powder chute and the probe.']
   };
 
+  /* Three lines per substance plus a nameplate line, written out from the
+     table rather than by hand: six substances by four states is twenty-four
+     entries, and a hand-written set would drift from the table the first
+     time a word changed. */
+  Object.keys(SUBSTANCE).forEach(function (k) {
+    var q = SUBSTANCE[k];
+    var low = q.label.toLowerCase();
+    IDENTITY['particle-' + k + '-pile'] = [q.label + ' particle',
+      q.pile || (q.label + ', the solute. Held in the pile by attraction to other ' + low + ' particles.')];
+    IDENTITY['particle-' + k + '-free'] = [q.label + ' particle', q.free || q.pile];
+    IDENTITY['particle-' + k + '-recovered'] = [q.label + ' particle', q.recovered];
+    IDENTITY['nameplate-' + k] = [q.label, q.label + ', ' + q.formula + '.'];
+  });
+
   var DEFAULT_ID = ['No selection', 'Select an object to identify it.'];
 
   /* ---- the engine ------------------------------------------------------- */
 
-  function makeSim(key) {
+  function makeSim(substance) {
     return new PS.Sim({
       seed: SEED,
       duration: DURATION,
@@ -230,7 +307,7 @@
       },
       onImpact: PS.rules.dissolve({
         solvent: 'solvent',
-        breakChance: SUBSTANCE[key].breakChance
+        breakChance: SUBSTANCE[substance].breakChance
       })
     });
   }
@@ -244,8 +321,9 @@
   /* One palette per station: the solute colour is the substance's own, and
      the solvent is water in both. Re-read on resize and on theme change, as
      the engine expects. */
-  function paletteFor(key) {
+  function paletteFor(st) {
     return function () {
+      var key = st.substance;
       var cs = getComputedStyle(document.documentElement);
       function v(n) { return cs.getPropertyValue(n).trim(); }
       return {
@@ -297,6 +375,7 @@
     manifest: 'layer-manifest.json',
     assets: 'assets/layers/',
     stations: STATIONS,
+    lamps: LAMPS,
     build: builders(),
     onIdentify: identify
   }).then(start).catch(function (err) {
@@ -376,8 +455,9 @@
         var bar = (box[2] / 2) * NM_FRACTION;
         node.innerHTML =
           '<canvas class="viewport__live" id="lens-' + station + '" role="img" ' +
-          'aria-label="Magnified view of ' + SUBSTANCE[station].label.toLowerCase() +
-          ' in water"></canvas>' +
+          /* Generic at build time — layers are placed before the stations
+             exist. setSubstance writes the real one. */
+          'aria-label="Magnified view of the sample in water"></canvas>' +
           '<canvas class="viewport__dry" id="dry-' + station + '" aria-hidden="true"></canvas>' +
           /* Just under the left arm of the crosshair, where the field is only
              ever sparse solvent: the heap stands a little under half the
@@ -435,8 +515,18 @@
       'beaker-{s}':    { make: function (node) { node.dataset.id = 'beaker'; } },
       'stirplate-{s}': { make: function (node) { node.dataset.id = 'stirplate'; } },
       'head-{s}':      { make: function (node) { node.dataset.id = 'head'; } },
-      'nameplate-{s}': { make: function (node, id, station) {
-        node.dataset.id = 'nameplate-' + station;
+      /* The sample plate. A real <button>, which is how it takes a tap at
+         all — the raster rule above kills pointer events on every layer that
+         is not one — and how Enter and Space come for free. applySubstance
+         fills the text; the art underneath is blank. */
+      'nameplate-{s}': { tag: 'button', make: function (node) {
+        node.type = 'button';
+        node.classList.add('plate');
+        node.style.backgroundImage = this.url('nameplate');
+        node.innerHTML =
+          '<i class="plate__dot" aria-hidden="true"></i>' +
+          '<b class="plate__name"></b>' +
+          '<span class="plate__formula"></span>';
       } },
       'sprite-stirbar-{s}': { make: function (node) { node.dataset.id = 'stirbar'; } },
       'sprite-pour-{s}':    { make: function (node) { node.dataset.id = 'nozzle'; } },
@@ -509,14 +599,81 @@
     idNow = key;
   }
 
+  /* Everything on screen that names or colours the sample. One place, so
+     what a swap has to touch is written down once: the collision rule, the
+     lamps, the field's colours and what a screen reader is told. */
+  function applySubstance(st, key) {
+    st.substance = key;
+    st.sim.cfg.onImpact = PS.rules.dissolve({
+      solvent: 'solvent',
+      breakChance: SUBSTANCE[key].breakChance
+    });
+
+    /* The lamps are art per substance and the halo is CSS over it. Set on
+       the register layer rather than written as a selector, because there
+       is no selector for "the station holding sodium chloride". */
+    var leds = inst.layers['register-leds-' + st.key];
+    if (leds) {
+      leds.style.setProperty('--led-off-img', 'var(--img-led-' + key + '-off)');
+      leds.style.setProperty('--led-on-img', 'var(--img-led-' + key + '-on)');
+      leds.style.setProperty('--led-on', 'var(--led-' + key + ')');
+    }
+
+    var plate = inst.layers['nameplate-' + st.key];
+    if (plate) {
+      plate.dataset.id = 'nameplate-' + key;
+      plate.style.setProperty('--plate-dot', 'var(--led-' + key + ')');
+      plate.querySelector('.plate__name').textContent = SUBSTANCE[key].label;
+      plate.querySelector('.plate__formula').textContent = SUBSTANCE[key].formula;
+    }
+
+    var canvas = $('lens-' + st.key);
+    if (canvas) {
+      canvas.setAttribute('aria-label', 'Magnified view of ' +
+        SUBSTANCE[key].label.toLowerCase() + ' in water');
+    }
+    st.lens.resize();          // re-reads the palette, so the field recolours
+  }
+
+  /* Changing the sample is Reset with different powder in the chute, which
+     is both what the machine would do and the only safe way to do it:
+     `onImpact` is read fresh on every collision, so swapping it on a live
+     sim leaves `sim.snaps` holding frames produced under the old rule, and a
+     later seek would replay to a state the run never had. reset() is what
+     throws that ring away. */
+  function setSubstance(st, key) {
+    applySubstance(st, key);
+    bus.emit('sampleChanged', { station: st.key, substance: key });
+    /* Restarted, not skipped if one is already running: a student stepping
+       to the sixth sample taps five times, and what has to land is the last
+       tap. Each restart re-runs the sequence from the top, so the drain and
+       the fresh powder play once, after they stop. */
+    enter('resetting');
+  }
+
+  /* Tapping a plate loads the next sample. Only while the beakers are dry:
+     a swap is a Reset, and resetting mid-run would throw away the comparison
+     the student is in the middle of. In every other state the plate still
+     identifies itself, which is what the readout is for. */
+  function cyclePlate(st) {
+    /* Only while the beakers are dry. Mid-run a swap would throw away the
+       comparison the student is in the middle of; mid-swap it is just the
+       next tap of the same choice. */
+    if (state !== 'loaded' && state !== 'resetting') return;
+    var at = CYCLE.indexOf(st.substance);
+    setSubstance(st, CYCLE[(at + 1) % CYCLE.length]);
+    say((st.key === 'left' ? 'Left' : 'Right') + ' sample: ' +
+        sub(st).label.toLowerCase() + '.');
+  }
+
   function start(instrument) {
     inst = instrument;
 
     STATIONS.forEach(function (key) {
       var st = {
         key: key,
-        sim: makeSim(key),
-        lens: new PS.Lens($('lens-' + key), { palette: paletteFor(key), groups: GROUPS }),
+        substance: STARTS[key],
+        sim: makeSim(STARTS[key]),
         dry: $('dry-' + key),
         water: inst.layers['water-' + key],
         turbidity: inst.layers['turbidity-' + key],
@@ -528,9 +685,16 @@
         pour: inst.sprites['sprite-pour-' + key],
         powder: inst.sprites['sprite-powder-' + key],
         bar: inst.sprites['sprite-stirbar-' + key],
-        clouds: SUBSTANCE[key].clouds,
         turb: 0, everStirred: false, level: 0, pileAt: 1
       };
+      /* Built after the station object exists: the palette reads
+         st.substance when it is called, so a swap recolours the field by
+         re-reading rather than by rebuilding the lens. */
+      st.lens = new PS.Lens($('lens-' + key), { palette: paletteFor(st), groups: GROUPS });
+      applySubstance(st, st.substance);
+      inst.layers['nameplate-' + key].addEventListener('click', (function (s) {
+        return function () { cyclePlate(s); };
+      })(st));
       st.bar.show(true);
 
       /* How far a bubble rises, and where the floor it leaves is: the same
@@ -696,7 +860,7 @@
     stirring = true;
     STATIONS.forEach(function (k) {
       var st = stations[k];
-      if (!st.clouds) return;
+      if (!sub(st).clouds) return;
       st.everStirred = true;
       st.turb = Math.min(TURBIDITY.cap, st.turb + TURBIDITY.stirStep);
     });
@@ -939,7 +1103,7 @@
       /* The bar turns for the model's stir, and also for a dry one where
          there is no model to ask. */
       shakeT = Math.max(0, shakeT - dt);
-      var spin = Math.max(stations.sugar.sim.stirProgress().strength,
+      var spin = Math.max(player.lead().stirProgress().strength,
                           shakeT / DRY_SHAKE);
       barPhase += spin * BAR_TURNS * dt;
     }
@@ -1035,8 +1199,12 @@
         var free = st.sim.count(GROUPS.free);
 
         if (free > lastFree[k]) {
-          bus.emit('particleFreed', { substance: k, count: free });
-          if (free === SOLUTE) bus.emit('allDissolved', { substance: k, count: free });
+          bus.emit('particleFreed',
+                   { station: k, substance: st.substance, count: free });
+          if (free === SOLUTE) {
+            bus.emit('allDissolved',
+                     { station: k, substance: st.substance, count: free });
+          }
         }
         lastFree[k] = free;
         /* The mound is gone while there is water, and comes back as the
@@ -1044,7 +1212,7 @@
         st.pileAt = 1 - boilLevel;
       });
 
-      var strength = stations.sugar.sim.stirProgress().strength;
+      var strength = player.lead().stirProgress().strength;
       if (stirring && strength <= 0.001) { stirring = false; bus.emit('stirEnded', {}); }
     }
   }
@@ -1053,7 +1221,7 @@
 
      Held at 100 C the water goes, and what was dissolved in it has nowhere
      left to stay: the solute comes back out onto the heap. That is the thing
-     worth seeing — dissolving did not destroy the sugar, and here it is
+     worth seeing — dissolving did not destroy the sample, and here it is
      again. Below the boil the beaker cools off faster than it heated up.
 
      Only as much can stay in solution as there is water to hold it, which is
@@ -1140,7 +1308,7 @@
      once it has been stirred up it settles slowly toward a faint haze and
      never returns to clear while there is water in the beaker. */
   function turbidity(st, dt) {
-    if (!st.clouds || !st.everStirred) return;
+    if (!sub(st).clouds || !st.everStirred) return;
     st.turb += (TURBIDITY.haze - st.turb) * Math.min(1, dt / TURBIDITY.settle);
   }
 
@@ -1168,12 +1336,12 @@
     /* The Stir key stays down for as long as the engine's stir lasts, which
        is the only feedback a keyboard press gets: a click carries no pointer
        to hold the cap down. Reset already does this for its own sequence. */
-    keys.stir.set(stations.sugar.sim.stirProgress().strength > 0.001);
+    keys.stir.set(player.lead().stirProgress().strength > 0.001);
     /* And it goes dim while the hand has nothing left. A deliberate stirrer
        never sees this — three strokes are there from the start and one comes
        back every 8 s — but a cap that presses and does nothing reads as a
        broken button rather than as an arm that is tired. */
-    keys.stir.enable(stations.sugar.sim.stirLeft >= 1);
+    keys.stir.enable(player.lead().stirLeft >= 1);
 
     STATIONS.forEach(function (k) {
       var st = stations[k];
@@ -1226,9 +1394,13 @@
     });
 
     if (state === 'running' && !frozen) {
-      say(freeOf('sugar') + ' of ' + SOLUTE + ' sugar particles and ' +
-          freeOf('caco3') + ' of ' + SOLUTE + ' calcium carbonate particles have ' +
-          'dissolved after ' + (player.lead().frame / 60).toFixed(0) + ' seconds.');
+      /* Built from the stations rather than welded together, or a swapped
+         sample would be narrated under the old substance's name. */
+      say(STATIONS.map(function (k) {
+        return freeOf(k) + ' of ' + SOLUTE + ' ' +
+               sub(stations[k]).label.toLowerCase() + ' particles';
+      }).join(' and ') +
+          ' have dissolved after ' + (player.lead().frame / 60).toFixed(0) + ' seconds.');
     }
   }
 
@@ -1317,7 +1489,7 @@
 
     var w = rect.width, h = rect.height;
     var rad = Math.min(w, h) / 2, cx = w / 2, cy = h / 2;
-    var pal = paletteFor(st.key)();
+    var pal = paletteFor(st)();
 
     g.clearRect(0, 0, w, h);
     g.save();
@@ -1404,7 +1576,8 @@
         if (!hit) return;
         identify(nameFor(st, hit.p));
         bus.emit('particleSelected', {
-          substance: hit.p.kind === 'solute' ? k : 'water',
+          station: k,
+          substance: hit.p.kind === 'solute' ? st.substance : 'water',
           index: hit.i,
           buried: hit.p.kind === 'solute' && hit.p.fixed && !hit.p.exposed
         });
@@ -1437,8 +1610,7 @@
 
   function nameFor(st, particle) {
     if (particle.kind === 'solvent') return 'particle-water';
-    if (st.key === 'caco3') return 'particle-caco3';
-    return particle.fixed ? 'particle-sugar-pile' : 'particle-sugar-free';
+    return 'particle-' + st.substance + (particle.fixed ? '-pile' : '-free');
   }
 
   /* ---- small helpers ---------------------------------------------------- */
