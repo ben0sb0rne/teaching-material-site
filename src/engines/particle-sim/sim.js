@@ -905,6 +905,37 @@
              stirLeft: this.stirLeft, heat: this.heat };
   };
 
+  /* How many particles matched `pred` at an earlier frame, read off the
+     snapshot ring rather than by replaying it. Null when that frame was
+     never captured — only multiples of `snapEvery` are.
+
+     Read-only: it does not touch the live field, so it is safe to call
+     mid-run. It exists because a caller that wants "how many had dissolved
+     at fifteen seconds" cannot ask the live field — the Player takes up to
+     eight steps per display frame, so by the time a frame notices it has
+     passed 15 s the model may be three frames further on, and a reading
+     that depends on how a browser paced its frames is not one two students
+     can compare.
+
+     The predicate is handed a plain object rather than the live particle,
+     because a snapshot stores state, not identity: `kind` comes from the
+     particle, since kinds never change, and the rest from the capture. */
+  Sim.prototype.countAt = function (frame, pred) {
+    var every = this.cfg.snapEvery;
+    if (frame % every !== 0) return null;
+    var snap = this.snaps[frame / every];
+    if (!snap) return null;
+    var n = 0;
+    for (var i = 0; i < this.particles.length; i++) {
+      if (pred({ kind: this.particles[i].kind,
+                 fixed: !!(snap.flags[i] & 1),
+                 exposed: !!(snap.flags[i] & 2),
+                 gone: !!(snap.flags[i] & 4),
+                 freedAt: snap.freed[i] })) n++;
+    }
+    return n;
+  };
+
   Sim.prototype.restore = function (s) {
     for (var i = 0; i < this.particles.length; i++) {
       var q = this.particles[i];

@@ -568,6 +568,17 @@
   var inst, player, notebook;
   var state = 'loaded';
   var stateT = 0;           // seconds in the current state
+
+  /* What the notebook needs to know about a run, and nothing else keeps.
+     All three are cleared when a fresh run starts, not when one ends, so a
+     student reading the beakers after a boil still sees the run's numbers. */
+  var stirs = 0;            // real stir presses since the water went in
+  var lastFreedAt = null;   // model seconds when a particle last broke free
+  var readingSent = false;  // the 15 s reading fires once per run
+
+  /* 15 s is after the dissolving has a shape and before anything else can
+     muddy it: at 100 C the water does not start boiling off until 18 s. */
+  var READING_AT = 15;
   var animT = 0;            // decorative clock: streams, grains, held by Freeze
   var barPhase = 0;         // stir bar rotation, in turns
   var shakeT = 0;           // seconds left of the dry powder being stirred
@@ -758,6 +769,10 @@
          can step the instrument itself. */
       hold: function (on) { held = on !== false; },
       press: function (name) { keys[name].el.click(); },
+      /* The event stream, so a scripted run can assert what the notebook
+         would have been told. Read-only in practice: nothing in the
+         activity subscribes. */
+      bus: bus,
       /* The model, for checking determinism and for running a sample far
          enough forward to see something without waiting for the display. */
       player: player,
@@ -856,7 +871,7 @@
        the turbidity to its cap and fires a stirStarted every press — the
        water would look thoroughly stirred while the model ignored it. */
     if (!player.stir()) return;
-    if (!stirring) bus.emit('stirStarted', {});
+    if (!stirring) { stirs += 1; bus.emit('stirStarted', {}); }
     stirring = true;
     STATIONS.forEach(function (k) {
       var st = stations[k];
@@ -868,7 +883,15 @@
 
   function setFrozen(on) {
     setFrozenSilently(on);
-    if (on) { player.pause(); say('Simulation frozen.', true); bus.emit('frozen', {}); }
+    if (on) {
+      player.pause();
+      say('Simulation frozen.', true);
+      /* How long ago a particle last broke free, so the notebook can tell a
+         student who froze on the moment from one who froze at random. */
+      bus.emit('frozen', { t: now(),
+                           sinceFreed: lastFreedAt === null ? null
+                                     : +(now() - lastFreedAt).toFixed(2) });
+    }
     else { player.play(); say('Simulation resumed.', true); bus.emit('unfrozen', {}); }
   }
 
@@ -1032,11 +1055,15 @@
     if (next === 'running') {
       // Already playing: the clock started when the water did, in `filling`.
       say('Water added.', true);
-      bus.emit('fillComplete', {});
+      stirs = 0; lastFreedAt = null; readingSent = false;
+      STATIONS.forEach(function (k) { stations[k].recovered = false; });
+      bus.emit('fillComplete', { tempC: Math.round(tempC), left: stations.left.substance,
+                                 right: stations.right.substance });
       STATIONS.forEach(function (k) { stations[k].pour.show(false); });
     }
 
     if (next === 'resetting') {
+      STATIONS.forEach(function (k) { stations[k].recovered = false; });
       setFrozenSilently(false);
       player.pause();
       keys.reset.set(true);
@@ -1199,11 +1226,14 @@
         var free = st.sim.count(GROUPS.free);
 
         if (free > lastFree[k]) {
+          lastFreedAt = now();
           bus.emit('particleFreed',
-                   { station: k, substance: st.substance, count: free });
+                   { station: k, substance: st.substance, count: free,
+                     t: now(), tempC: Math.round(tempC), stirs: stirs });
           if (free === SOLUTE) {
             bus.emit('allDissolved',
-                     { station: k, substance: st.substance, count: free });
+                     { station: k, substance: st.substance, count: free,
+                     t: now(), tempC: Math.round(tempC), stirs: stirs });
           }
         }
         lastFree[k] = free;
@@ -1212,9 +1242,38 @@
         st.pileAt = 1 - boilLevel;
       });
 
+      sendReading();
+
       var strength = player.lead().stirProgress().strength;
       if (stirring && strength <= 0.001) { stirring = false; bus.emit('stirEnded', {}); }
     }
+  }
+
+  /* One reading per run, at fifteen seconds, which is the row the notebook
+     writes down.
+
+     The counts are read off each sim's snapshot at exactly frame 900 rather
+     than off the live field, because the Player takes up to eight model
+     steps per display frame: by the time a frame notices the clock has
+     passed fifteen seconds the model may be at 903, and how far past
+     depends on how the browser paced its frames. Two students running the
+     same sample at the same temperature have to get the same number. */
+  function sendReading() {
+    var frame = READING_AT * 60;
+    if (readingSent || player.lead().frame < frame) return;
+
+    var detail = { t: READING_AT, tempC: Math.round(tempC), stirs: stirs };
+    var short = false;
+    STATIONS.forEach(function (k) {
+      var at = stations[k].sim.countAt(frame, GROUPS.free);
+      if (at === null) short = true;
+      detail[k] = { substance: stations[k].substance, free: at };
+    });
+    // No snapshot for that frame means the run never passed through it.
+    if (short) return;
+
+    readingSent = true;
+    bus.emit('reading', detail);
   }
 
   /* Boiling.
@@ -1300,7 +1359,13 @@
   function finishDry() {
     player.render();                    // the lens holds the finished heap
     say('The water boiled away. The solid is left behind.', true);
-    bus.emit('boiledDry', {});
+    /* Whatever dissolved is back on the heap, so from here a pile particle
+       answers with its recovered line rather than its in-the-pile one. The
+       next run clears it; `loaded` does not, because this IS loaded. */
+    STATIONS.forEach(function (k) { stations[k].recovered = true; });
+    bus.emit('boiledDry', { t: now(), tempC: Math.round(tempC),
+                            left: stations.left.substance,
+                            right: stations.right.substance });
     enter('loaded');
   }
 
@@ -1577,6 +1642,9 @@
         identify(nameFor(st, hit.p));
         bus.emit('particleSelected', {
           station: k,
+          /* A buried particle is one the water cannot reach, which is the
+             whole reason a lump dissolves from the outside in. */
+          buried: hit.p.kind === 'solute' && hit.p.fixed && !hit.p.exposed,
           substance: hit.p.kind === 'solute' ? st.substance : 'water',
           index: hit.i,
           buried: hit.p.kind === 'solute' && hit.p.fixed && !hit.p.exposed
@@ -1610,10 +1678,17 @@
 
   function nameFor(st, particle) {
     if (particle.kind === 'solvent') return 'particle-water';
+    /* After a boil the heap is what came back out of solution, so it says so
+       until the next run. Calcium carbonate's recovered line is the one that
+       points out nothing had to come back. */
+    if (particle.fixed && st.recovered) return 'particle-' + st.substance + '-recovered';
     return 'particle-' + st.substance + (particle.fixed ? '-pile' : '-free');
   }
 
   /* ---- small helpers ---------------------------------------------------- */
+
+  // Seconds since the water went in, which is what the clock shows.
+  function now() { return player.lead().frame / 60; }
 
   function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
   function ease(t) { return 1 - Math.pow(1 - t, 3); }      // ease-out

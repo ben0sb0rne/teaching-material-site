@@ -290,6 +290,33 @@ check('seeking back from frame 180000 is exact',
         Math.abs(q.x - ref1k.particles[i].x) +
         Math.abs(q.y - ref1k.particles[i].y))), 0);
 
+/* The notebook's reading.
+ *
+ * The activity takes one reading per run, at fifteen seconds, and writes it
+ * in a table two students compare. It reads the count off the snapshot ring
+ * rather than off the live field, because the Player takes up to eight model
+ * steps per display frame — a reading taken when a frame happens to notice
+ * would depend on how the browser paced its frames.
+ *
+ * So: the snapshot at frame 900 has to exist, agree with the live field at
+ * frame 900, and be the same number on a fresh run of the same sample. */
+const READ_AT = 900;
+const freeAt = s => s.countAt(READ_AT, q => q.kind === 'solute' && !q.fixed);
+
+const liveAt900 = build();
+for (let f = 0; f < READ_AT; f++) liveAt900.step();
+const live = liveAt900.count(q => q.kind === 'solute' && !q.fixed);
+for (let f = READ_AT; f < READ_AT + 40; f++) liveAt900.step();   // run past it
+check('the 15 s reading survives running past it', freeAt(liveAt900), live);
+
+const readA = build(), readB = build();
+for (let f = 0; f < READ_AT + 120; f++) { readA.step(); readB.step(); }
+check('two fresh runs read the same at 15 s', freeAt(readA), freeAt(readB));
+check('the 15 s reading is a real count', freeAt(readA) > 0 && freeAt(readA) < SOLUTE, true);
+
+// Only multiples of snapEvery are captured; anything else must say so.
+check('an uncaptured frame reads null', readA.countAt(READ_AT + 1, () => true), null);
+
 if (open.length) {
   console.log('\n%d target(s) still open — the stir still concentrates grains at the rim:', open.length);
   open.forEach(f => console.log('  ' + f));
