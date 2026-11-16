@@ -495,9 +495,14 @@
   }).then(start).catch(function (err) {
     var boot = $('boot');
     boot.hidden = false;
+    /* The dev-server line is only true on file://; over http it sent us the
+       wrong way through a Pages failure whose cause was JSON of the wrong shape. */
     boot.textContent = 'This activity could not load its layout (' + err.message +
-      '). It needs to be served over http — try the dev server rather than ' +
-      'opening the file directly.';
+      '). ' + (location.protocol === 'file:'
+        ? 'It needs to be served over http — try the dev server rather than ' +
+          'opening the file directly.'
+        : 'Look in the console for the failed request, or for JSON that did ' +
+          'not parse.');
   });
 
   /* ---- what the code-drawn layers are made of --------------------------- */
