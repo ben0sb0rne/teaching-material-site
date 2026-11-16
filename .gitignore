@@ -14,3 +14,9 @@ art-source/*
 .DS_Store
 __pycache__/
 *.pyc
+
+# Impeccable's local cache: session ids, per-file edit counts, timestamps and
+# absolute paths off this machine. It churns on every edit and says nothing
+# about the project. The mocks and surfaces beside it are design history and
+# do stay in.
+.impeccable/hook.cache.json
