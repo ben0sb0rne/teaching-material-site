@@ -133,7 +133,12 @@ Worth knowing before standing in front of the class.
   whole activity rests on is that nothing differs between them except the
   sample.
 - **Sugar comes back unchanged from a boil.** Real sugar caramelises. The
-  recovered line says so; the picture does not.
+  recovered line says so; the picture does not — it shows the glassy residue
+  a dried sugar solution leaves, not caramel.
+- **The residue crystals are placeholders.** Shape is right, detail is not:
+  cubes for sodium chloride, needles for magnesium sulfate, rounded grains
+  for sucrose, and one generic crystal for sodium bicarbonate and calcium
+  chloride. A substance with no residue of its own keeps the poured powder.
 - **Salt is modelled as one particle, not as ions.** That matches FOSS's own
   Investigation 1 background, which defines a particle as the formula unit.
 - **There is no filter.** `exp-filter` brings in the result from the bench
