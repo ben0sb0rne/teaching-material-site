@@ -429,7 +429,15 @@
       if (base === PLACEHOLDER) return Promise.resolve(null);
       return fetch(base + '?list').then(function (r) {
         var type = r.headers.get('content-type') || '';
-        return r.ok && type.indexOf('json') >= 0 ? r.json() : null;
+        if (!r.ok || type.indexOf('json') < 0) return null;
+        /* An array or nothing. GitHub Pages ignores the query string and
+           answers this with index.json — 200, and genuinely JSON, but an
+           object, which used to reach forEach and take the whole page down
+           with "names.forEach is not a function". A local static server
+           returns the directory as HTML instead and never got that far, so
+           only the real host showed it. */
+        return r.json().then(function (j) { return Array.isArray(j) ? j : null; },
+                             function () { return null; });
       }, function () { return null; }).then(function (names) {
         if (names) return names;
         return fetch(base + 'present.json').then(function (r) {
