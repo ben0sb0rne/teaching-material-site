@@ -113,8 +113,16 @@
 
   /* The one vertical rhythm that is shared with the art: the notebook's
      ruled lines, so handwriting sits on them instead of floating. */
+  /* A tap target inside the stage. The kit's --tap is 48 CSS px, but
+     everything in here is drawn in stage points and then scaled: at
+     1366x768 the scale is 0.768, so a 48-point control lands at 37 CSS px
+     and misses the rule. 62.5 points is 48 CSS px at that size. Below
+     16:10 the stage scales down further and nothing in here can hold 48
+     without being enormous on a Chromebook, which is the target. */
+  --tap-stage: 62.5px;
+
   --rule-gap: 37px;
-  --rule-first: 500px;        /* first rule, from the top of notebook-text */
+  --rule-first: 600px;        /* first rule, from the top of notebook-text */
 }
 
 /* This instrument has one appearance. The kit ships a dark plate and a light
@@ -639,21 +647,69 @@ body {
 .notebook {
   font-family: var(--font-hand);
   color: var(--note-ink);
-  font-size: 20px;
-  line-height: 1.14;
+  /* 18, not 20: a page now carries eight items rather than three, and the
+     answers to a multiple-choice question are sentences. */
+  font-size: 18px;
+  line-height: 1.12;
+  --page-top: 56px;
 }
 
-/* The lists own the page above the first ruled line, and no more than that. */
+/* Three pages, so the notebook needs a way to turn to one. Plain buttons
+   with aria-pressed, not a tablist: a tablist owes the keyboard arrow keys,
+   a roving tabindex and Home/End, and three buttons in the ordinary tab
+   order owe nothing and get there just as well. */
+.notebook__tabs {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  display: flex;
+  gap: 6px;
+}
+
+.notebook__tab {
+  appearance: none;
+  flex: 1;
+  min-height: var(--tap-stage);
+  padding: 2px 4px;
+  font: 400 24px/1 var(--font-hand);
+  color: var(--note-ink-2);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--note-rule);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.notebook__tab.is-on {
+  color: var(--note-ink);
+  border-bottom-width: 3px;
+  border-bottom-color: currentColor;
+}
+
+/* One page at a time. Each is laid out against the paper exactly as the
+   single page used to be, just lower — the ruling is drawn by the list
+   itself, so a page that starts further down brings its rules with it. */
+.notebook__page {
+  position: absolute;
+  left: 0; right: 0;
+  top: var(--page-top);
+  bottom: 0;
+}
+
+/* The lists own the page above the first ruled line, and no more than that.
+   A page with more items than fits scrolls inside the paper rather than
+   writing over the ruling. */
 .notebook__top {
   position: absolute;
   left: 0; right: 0; top: 0;
-  height: calc(var(--rule-first) - 54px);
-  overflow: hidden;
+  height: calc(var(--rule-first) - 54px - var(--page-top));
+  padding-top: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /* Written, not typeset: these are headings in a student's own notebook. */
 .notebook__head {
-  font: 400 27px/1 var(--font-hand);
+  font: 400 24px/1 var(--font-hand);
   color: var(--note-ink);
   margin: 0 0 7px;
 }
@@ -664,10 +720,10 @@ body {
 
 .notebook__item {
   display: grid;
-  grid-template-columns: 24px 1fr;
+  grid-template-columns: 20px 1fr;
   align-items: start;
   gap: 2px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 /* Objectives take a square box, challenges a diamond in the second pen, so
@@ -688,13 +744,13 @@ body {
 
 .notebook__text { position: relative; }
 
-.notebook__item.is-done .notebook__text::after {
-  content: "";
-  position: absolute;
-  left: -2px; right: -2px; top: 52%;
-  border-top: 2px solid currentColor;
-  transform: scaleX(var(--struck, 1));
-  transform-origin: 0 50%;
+/* Struck through, line by line. This was one absolutely-positioned rule
+   across the whole block, which was right while every item was one line
+   long: on a two-line item it lands in the gap between them and reads as a
+   rule under the first line. text-decoration follows the wrapping. */
+.notebook__item.is-done .notebook__text {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
 }
 
 /* A drawn tick, rather than a glyph from a font that may not have one. */
@@ -715,17 +771,35 @@ body {
   transform: rotate(-5deg);
 }
 
-/* Predictions: tappable, and large enough to tap. */
-.notebook__choices { display: flex; gap: 8px; margin: 4px 0 2px; }
+/* A wrong pick gets a nudge and the item stays open. Never a verdict. */
+.notebook__nudge {
+  margin: 4px 0 2px;
+  color: var(--note-ink-2);
+  font-size: 18px;
+}
+
+/* Where the rest of a page lives, when it lives on paper. */
+.notebook__note {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  margin: 0;
+  color: var(--note-ink-2);
+  font-size: 18px;
+}
+
+/* Answers: tappable, and large enough to tap. They wrap, because some of
+   them are a sentence. */
+.notebook__choices { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 2px; }
 
 .notebook__choice {
   appearance: none;
   font: inherit;
   color: inherit;
   /* The kit's tap target, in stage points like every other control here. */
-  min-height: var(--tap);
+  min-height: var(--tap-stage);
   min-width: 60px;
-  padding: 2px 14px;
+  padding: 2px 12px;
+  text-align: left;
   background: transparent;
   border: 2px solid currentColor;
   border-radius: 14px;
@@ -737,6 +811,14 @@ body {
 }
 
 .notebook__choice.is-picked span { color: var(--note-paper); }
+
+/* An answered item keeps its line, not its buttons. They are dead weight on
+   a page that already has to scroll. A prediction folds down as soon as it
+   is committed, long before its trigger completes it; a wrong pick keeps
+   its options, because the student is going to change it. */
+.notebook__item.is-answered .notebook__choice:not(.is-picked) { display: none; }
+.notebook__item.is-done .notebook__choices,
+.notebook__item.is-done .notebook__nudge { display: none; }
 
 /* Observations are written on the paper's own ruled lines: the line box is
    one rule tall, and the list is lifted so the writing sits on the rule
@@ -757,7 +839,11 @@ body {
   bottom: 0;
   margin: 0; padding: 0;
   list-style: none;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* local, so the ruling scrolls with the writing instead of staying put
+     under it. */
+  background-attachment: local;
   background-image: repeating-linear-gradient(
     to bottom,
     transparent 0, transparent calc(var(--rule-gap) - 1.3px),

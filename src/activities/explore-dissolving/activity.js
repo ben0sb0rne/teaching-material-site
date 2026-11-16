@@ -741,7 +741,11 @@
 
     buildKeys();
     buildHeat();
-    notebook = new Notebook({ root: $('notebook'), bus: bus, say: say });
+    /* The words for a substance key: they live in the table above, and the
+       notebook is handed them rather than keeping a second copy. */
+    var labels = {};
+    Object.keys(SUBSTANCE).forEach(function (k) { labels[k] = SUBSTANCE[k].label; });
+    notebook = new Notebook({ root: $('notebook'), bus: bus, say: say, labels: labels });
 
     inst.onResize = resize;
     resize();
@@ -1642,8 +1646,11 @@
         identify(nameFor(st, hit.p));
         bus.emit('particleSelected', {
           station: k,
-          /* A buried particle is one the water cannot reach, which is the
-             whole reason a lump dissolves from the outside in. */
+          /* Buried means the water cannot reach it, which is the whole
+             reason a lump dissolves from the outside in. `fixed` is sent
+             alongside because "on the surface of the pile" and "already
+             dissolved" are both unburied, and they are not the same thing. */
+          fixed: hit.p.kind === 'solute' && hit.p.fixed,
           buried: hit.p.kind === 'solute' && hit.p.fixed && !hit.p.exposed,
           substance: hit.p.kind === 'solute' ? st.substance : 'water',
           index: hit.i,
