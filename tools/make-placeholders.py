@@ -611,6 +611,23 @@ def boxes_by_name(manifest):
     return out
 
 
+def write_listing(where):
+    """Record what this set holds, for hosts that cannot be asked.
+
+    The dev server answers `?list`; GitHub Pages and every other static host
+    do not, so instrument.js reads this instead and falls back per file to
+    the placeholder set exactly as it does locally. Without it a
+    part-finished set deploys as a bench with six layers on it.
+
+    Every name, not just the .webp, because `?list` returns the whole
+    directory and the loader uses it to find geometry.json and index.json.
+    """
+    names = sorted(f.name for f in where.iterdir()
+                   if f.is_file() and f.name != "present.json")
+    (where / "present.json").write_text(json.dumps(names, indent=0) + "\n")
+    return len(names)
+
+
 def check(folder):
     """Compare an exported set against the manifest.
 
@@ -675,6 +692,11 @@ def check(folder):
     print()
     print("%d ok, %d off-spec, %d not made yet, %d stray   (%s)"
           % (len(good), len(wrong), len(absent), len(stray), where.relative_to(ROOT)))
+
+    # The deployed page reads this to know what the set holds; refreshing it
+    # here means exporting art and checking it is still one step.
+    print("wrote present.json, %d files   (a static host reads this)"
+          % write_listing(where))
     return len(wrong)
 
 

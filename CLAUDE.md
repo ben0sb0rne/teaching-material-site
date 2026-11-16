@@ -172,6 +172,13 @@ Art lives in two folders — `assets/layers/` is the finished renders that ship,
 to the placeholder when the finished set has not got it yet. Never write an
 asset path into CSS; everything goes through `Instrument.prototype.url`.
 
+That fallback needs a listing to work. The dev server answers `?list`; a
+static host cannot be asked, so the set carries `present.json` and
+`make-placeholders.py --check layers` writes it. **Run that after exporting
+art**, or the deployed page loads every undrawn layer from `assets/layers/`,
+404s on each, and comes up as a bare bench — which is exactly what the first
+GitHub Pages deploy did.
+
 Vite and the `npm run build|pack` pipeline arrive at Phase 1.
 
 ## Building on particle-sim

@@ -416,14 +416,26 @@
        each file instead means a 404 per missing render, and the browser logs
        every one of them whatever the code does with the result.
 
-       No listing means no dev server, which means this is the real thing
-       being served: treat the set as whole and do not fall back. */
+       A real host answers no such question, so the set carries the answer:
+       make-placeholders.py writes present.json beside the renders. Without
+       it a part-finished set on a static host silently loads every layer
+       from this folder, 404s on the forty that are not drawn yet, and comes
+       up as a bench with almost nothing on it. That is what the first
+       GitHub Pages deploy did.
+
+       The live listing wins where there is one, so dropping a new export in
+       still works without re-running anything. */
     function listing() {
       if (base === PLACEHOLDER) return Promise.resolve(null);
       return fetch(base + '?list').then(function (r) {
         var type = r.headers.get('content-type') || '';
         return r.ok && type.indexOf('json') >= 0 ? r.json() : null;
-      }, function () { return null; });
+      }, function () { return null; }).then(function (names) {
+        if (names) return names;
+        return fetch(base + 'present.json').then(function (r) {
+          return r.ok ? r.json() : null;
+        }, function () { return null; });
+      });
     }
 
     return listing().then(function (names) {
