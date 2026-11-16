@@ -74,9 +74,10 @@ grain of salt — the lesson's reference case — in the frame. At 1 mm it was
 eight grains with "One grain" written under them.
 
 **Step 3 shows no box for step 4, and that is the lesson.** Each step draws a
-box where the next view comes from. From 0.4 mm to 13.6 nm that box would be
-four thousandths of a point across. It cannot be drawn, so the readout says the
-number instead: *the next view is 1/22,000 of it.*
+box where the next view comes from. The first two are easy. From 0.4 mm to
+13.6 nm is a jump of **29,455**, and that box would be one hundredth of a
+point across — it cannot be drawn at all. So the readout says the number
+instead: *the next view is 1/22,000 of it.*
 
 Step 4 is also where colour appears. The powder is drawn white at every real
 magnification, because all six are white in the hand; the per-substance hues

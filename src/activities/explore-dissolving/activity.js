@@ -109,9 +109,9 @@
 
     /* No line and no reticle, both on purpose. The line is written per
        substance, because a grain of Epsom salts overruns this frame while
-       chalk is dust. And the box the next view comes from would be four
-       thousandths of a point across — not a drawing problem but the whole
-       lesson, so the caption says it instead. */
+       chalk is dust. And the box the next view comes from would be a
+       hundredth of a point across — not a drawing problem but the whole
+       lesson, so the readout says the number instead. */
     { field: 0.4 * MM, bar: 0.1 * MM, barLabel: '0.1 mm',
       barDesc: 'One tenth of a millimetre.',
       cap: null, viewDesc: null,      // both written per substance
@@ -1849,7 +1849,8 @@
 
     /* Where the next view comes from, the idiom every powers-of-ten diagram
        uses. It exists at the first two steps and cannot exist at the third:
-       13.58 nm inside a millimetre is four thousandths of a point. That
+       13.58 nm inside four tenths of a millimetre is a hundredth of a
+       point — a jump of 29,455 against the tidy tens above it. That
        impossibility is the lesson, so the caption says it instead. */
     if (z.reticleAt) {
       var side = 2 * rad * (ZOOM[zoom + 1].field / z.field);
