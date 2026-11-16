@@ -107,6 +107,12 @@ LED = {
 }
 LED_PT = 15                 # the socket pitch the register panel is drilled for
 
+# What a sample leaves when the water has boiled off. All four are the same
+# white as the poured powder: what differs is the crystal, which is the whole
+# point — a hand lens is how you tell Epsom salts from table salt, and that
+# is the question the I-Check asks.
+RESIDUE = ("cubes", "needles", "glassy", "crystal")
+
 
 def q(el, tag):
     return el.iter("{%s}%s" % (SVG_NS, tag))
@@ -431,6 +437,65 @@ def led(substance, lit, dest):
     render(doc, LED_PT * SCALE, LED_PT * SCALE, dest)
 
 
+def residue(shape, box, dest):
+    """A dried mound, drawn as the crystals that sample really leaves.
+
+    It keeps the poured heap's footprint — measured off SOURCE-pile-sugar,
+    a shallow ridge across the middle of the beaker's floor — so the swap
+    reads as the same pile changing rather than as a different object.
+
+    The scatter is seeded, so re-running writes the same bytes and the file
+    does not churn in git for nothing.
+    """
+    w, h = int(box[2] * SCALE), int(box[3] * SCALE)
+    x0, x1 = 0.2754 * w, 0.7228 * w
+    top, base = 0.9147 * h, 0.9813 * h
+    fill, edge = POWDER
+
+    seed = [sum(ord(c) for c in shape) * 7919 + 1]
+
+    def rnd():
+        seed[0] = (seed[0] * 1103515245 + 12345) & 0x7FFFFFFF
+        return seed[0] / 0x7FFFFFFF
+
+    mid, span = (x0 + x1) / 2, (x1 - x0) / 2
+    bits = []
+    for _ in range(170):
+        # Across the ridge, denser in the middle, and never above its arc.
+        t = (rnd() + rnd() + rnd()) / 3 * 2 - 1          # -1..1, centre-weighted
+        cx = mid + t * span
+        ridge = base - (base - top) * (1 - t * t)        # the mound's profile
+        cy = ridge + rnd() * (base - ridge) * 1.05
+        if cy > base:
+            continue
+        a = rnd() * 360
+        light = rnd() > 0.62
+        c = "#FFFFFF" if light else (fill if rnd() > 0.3 else edge)
+        if shape == "needles":
+            a = -70 + rnd() * 140                        # steep, like real habit
+            bits.append('<rect x="%.1f" y="%.1f" width="2.1" height="%.1f" fill="%s" '
+                        'transform="rotate(%.1f %.1f %.1f)"/>'
+                        % (cx - 1, cy - 5.5, 7 + rnd() * 6, c, a, cx, cy))
+        elif shape == "cubes":
+            k = 3.4 + rnd() * 2.2
+            bits.append('<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" fill="%s" '
+                        'transform="rotate(%.1f %.1f %.1f)"/>'
+                        % (cx - k / 2, cy - k / 2, k, k, c, (a % 90) - 45, cx, cy))
+        elif shape == "glassy":
+            bits.append('<ellipse cx="%.1f" cy="%.1f" rx="%.1f" ry="%.1f" fill="%s"/>'
+                        % (cx, cy, 2.6 + rnd() * 2.4, 2.0 + rnd() * 1.6, c))
+        else:                                            # crystal: irregular grains
+            k = 2.6 + rnd() * 2.4
+            pts = " ".join("%.1f,%.1f" % (cx + k * math.cos(math.radians(a + i * 72)),
+                                          cy + k * 0.8 * math.sin(math.radians(a + i * 72)))
+                           for i in range(5))
+            bits.append('<polygon points="%s" fill="%s"/>' % (pts, c))
+
+    doc = ('<svg xmlns="%s" viewBox="0 0 %d %d" width="%d" height="%d">'
+           '<g>%s</g></svg>' % (SVG_NS, w, h, w, h, "".join(bits)))
+    render(doc, w, h, dest)
+
+
 def sprite_sheet(kind, station, box, dest):
     """All frames of one sprite, side by side in a single document.
 
@@ -577,6 +642,9 @@ def check(folder):
         # the socket pitch is what one lamp is drawn at.
         if layer_id.startswith("led-"):
             w = h = LED_PT
+        elif layer_id.startswith("residue-"):
+            # It stands in for the heap, so it is drawn at the heap's box.
+            w, h = box["pile-" + STATIONS[0]][2], box["pile-" + STATIONS[0]][3]
         elif layer_id in box:
             w, h = box[layer_id][2], box[layer_id][3]
         else:
@@ -675,6 +743,13 @@ def main():
             lambda out, g="nameplate-" + s_, b=nb:
                 (lambda: render(isolate("01-loaded", g, b, strip_text),
                                 int(b[2] * SCALE), int(b[3] * SCALE), out)))
+
+    # What is left when a sample has been boiled dry. Not manifest layers:
+    # they stand in for the pile, in the pile's own box.
+    pile_box = boxes_by_name(manifest)["pile-" + STATIONS[0]]
+    for shape in RESIDUE:
+        add("residue-" + shape,
+            lambda out, sh=shape, b=pile_box: (lambda: residue(sh, b, out)))
 
     for substance in LED:
         for state in ("off", "on"):

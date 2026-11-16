@@ -457,6 +457,13 @@ body {
   border-radius: 50%;
 }
 
+/* The dry frame is aria-hidden decoration drawn over the live canvas, and
+   the live canvas is what carries the click that identifies a particle. At
+   full opacity — which is exactly the state a boiled-dry beaker is left in
+   — it was swallowing every tap on the heap, so the one thing a student is
+   asked to identify after a boil could not be identified at all. */
+.viewport__dry { pointer-events: none; }
+
 /* The dry frame sits over the live canvas and is wiped away as water arrives,
    bottom-up, then wiped back top-down as the beaker drains. It is second in
    the DOM, which is all it needs: a z-index here would escape, because

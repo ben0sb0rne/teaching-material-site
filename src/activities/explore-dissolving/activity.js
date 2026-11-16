@@ -118,38 +118,39 @@
   var SUBSTANCE = {
     nacl: {
       label: 'Sodium chloride', common: 'table salt', formula: 'NaCl',
-      breakChance: BUILD.breakChance * 1.1, clouds: false,
+      breakChance: BUILD.breakChance * 1.1, clouds: false, residue: 'cubes',
       free: 'Dissolved sodium chloride. Part of the solution.',
       recovered: 'Sodium chloride, back out of solution. The same substance you started with.'
     },
     caco3: {
       label: 'Calcium carbonate', common: 'chalk', formula: 'CaCO\u2083',
       // What will not dissolve can still be stirred up into suspension.
-      breakChance: 0, clouds: true,
+      // Never dissolves, so nothing ever comes back out as crystals.
+      breakChance: 0, clouds: true, residue: false,
       pile: 'Calcium carbonate, the main ingredient in chalk. Insoluble in water.',
       recovered: 'Calcium carbonate. It never dissolved, so nothing had to come back.'
     },
     sucrose: {
       label: 'Sucrose', common: 'table sugar', formula: 'C\u2081\u2082H\u2082\u2082O\u2081\u2081',
-      breakChance: BUILD.breakChance, clouds: false,
+      breakChance: BUILD.breakChance, clouds: false, residue: 'glassy',
       free: 'Dissolved sucrose. Part of the solution.',
       recovered: 'Recovered sucrose. On a real stove, sugar heated past dry browns into caramel, a new substance.'
     },
     nahco3: {
       label: 'Sodium bicarbonate', common: 'baking soda', formula: 'NaHCO\u2083',
-      breakChance: BUILD.breakChance * 0.3, clouds: false,
+      breakChance: BUILD.breakChance * 0.3, clouds: false, residue: 'crystal',
       free: 'Dissolved sodium bicarbonate. Part of the solution.',
       recovered: 'Recovered sodium bicarbonate. Real baking soda heated past dry breaks down into sodium carbonate, a new substance.'
     },
     mgso4: {
       label: 'Magnesium sulfate', common: 'Epsom salts', formula: 'MgSO\u2084',
-      breakChance: BUILD.breakChance * 0.9, clouds: false,
+      breakChance: BUILD.breakChance * 0.9, clouds: false, residue: 'needles',
       free: 'Dissolved magnesium sulfate. Part of the solution.',
       recovered: 'Magnesium sulfate, back out of solution. Real crystals often grow as needles.'
     },
     cacl2: {
       label: 'Calcium chloride', common: 'ice melt', formula: 'CaCl\u2082',
-      breakChance: BUILD.breakChance * 1.5, clouds: false,
+      breakChance: BUILD.breakChance * 1.5, clouds: false, residue: 'crystal',
       free: 'Dissolved calcium chloride. Dissolving it releases thermal energy, so a real beaker warms up.',
       recovered: 'Recovered calcium chloride. A real sample pulls water from the air and stays damp.'
     }
@@ -610,6 +611,22 @@
     idNow = key;
   }
 
+  /* The heap's picture. Poured, it is the shared white powder — all six
+     look alike in a beaker, which is the lesson's point. After a boil has
+     driven the sample back out of solution it is that substance's own
+     crystal, which is the thing a hand lens shows and the thing the FOSS
+     I-Check asks a student to read.
+
+     Branching on the table's `residue`, never on whether a file is there:
+     Instrument.url only falls back to the placeholder set when it has a
+     listing to check against, and in production it has none — so a missing
+     render would leave the mound invisible with nothing to say why. */
+  function paintPile(st) {
+    var shape = st.recovered && sub(st).residue;
+    st.pile.style.backgroundImage =
+      inst.url(shape ? 'residue-' + shape : 'pile-' + st.key);
+  }
+
   /* Everything on screen that names or colours the sample. One place, so
      what a swap has to touch is written down once: the collision rule, the
      lamps, the field's colours and what a screen reader is told. */
@@ -643,6 +660,7 @@
       canvas.setAttribute('aria-label', 'Magnified view of ' +
         SUBSTANCE[key].label.toLowerCase() + ' in water');
     }
+    paintPile(st);
     st.lens.resize();          // re-reads the palette, so the field recolours
   }
 
@@ -1060,14 +1078,20 @@
       // Already playing: the clock started when the water did, in `filling`.
       say('Water added.', true);
       stirs = 0; lastFreedAt = null; readingSent = false;
-      STATIONS.forEach(function (k) { stations[k].recovered = false; });
+      STATIONS.forEach(function (k) {
+        stations[k].recovered = false;
+        paintPile(stations[k]);
+      });
       bus.emit('fillComplete', { tempC: Math.round(tempC), left: stations.left.substance,
                                  right: stations.right.substance });
       STATIONS.forEach(function (k) { stations[k].pour.show(false); });
     }
 
     if (next === 'resetting') {
-      STATIONS.forEach(function (k) { stations[k].recovered = false; });
+      STATIONS.forEach(function (k) {
+        stations[k].recovered = false;
+        paintPile(stations[k]);
+      });
       setFrozenSilently(false);
       player.pause();
       keys.reset.set(true);
@@ -1366,7 +1390,10 @@
     /* Whatever dissolved is back on the heap, so from here a pile particle
        answers with its recovered line rather than its in-the-pile one. The
        next run clears it; `loaded` does not, because this IS loaded. */
-    STATIONS.forEach(function (k) { stations[k].recovered = true; });
+    STATIONS.forEach(function (k) {
+      stations[k].recovered = true;
+      paintPile(stations[k]);
+    });
     bus.emit('boiledDry', { t: now(), tempC: Math.round(tempC),
                             left: stations.left.substance,
                             right: stations.right.substance });
