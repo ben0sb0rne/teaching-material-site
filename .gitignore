@@ -1,0 +1,16 @@
+# The publisher's FOSS units: 102 GB, and Lawrence Hall of Science copyright.
+# Reference only — it must never reach a public repo. See reference/thinklink/CLAUDE.md.
+reference/
+
+# Source art. ~100 MB of PSDs, one of them 65 MB, and git stores a whole new
+# copy of a binary on every save. OneDrive already versions this folder.
+# What ships is the exported .webp under src/, which is committed.
+art-source/*
+!art-source/README.md
+
+# Per-machine editor state. launch.json is shared and stays in.
+.claude/settings.local.json
+
+.DS_Store
+__pycache__/
+*.pyc

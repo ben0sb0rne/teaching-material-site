@@ -1,0 +1,980 @@
+/* ==========================================================================
+   Explore Dissolving — one fictional scientific instrument on a lab bench.
+
+   The whole screen is a fixed 1600 x 1000 point safe area, scaled uniformly
+   to fit the viewport. Nothing reflows: every layer sits where
+   layer-manifest.json says it does, in safe-area points, and JS only ever
+   sets three numbers on :root — the scale and the two offsets.
+
+   So all sizes below are in safe-area points, not device pixels, and they
+   are all *within* a layer. Layer boxes themselves live in the manifest and
+   appear nowhere here.
+
+   Instrument colours are declared once, at the top. The project rule is that
+   colour lives in src/kit/tokens.css; that file does not exist yet and this
+   palette belongs to this instrument rather than to the kit, so it is
+   declared here as the one place to change it. It moves when tokens.css
+   lands.
+   ========================================================================== */
+
+:root {
+  /* From the spec's colour table. */
+  --p-water:  #5B8FD6;
+  --p-sugar:  #D2603F;
+  --p-caco3:  #E9E4D6;
+  --led-sugar-lit: #FF7A52;
+
+  /* Shoulder and terminator for each particle sphere, which the engine
+     shades between. Derived from the three above, not new colours. */
+  --p-water-lit: #B9D4F5;  --p-water-dim: #22406B;
+  --p-sugar-lit: #FFA98C;  --p-sugar-dim: #7A2E18;
+  --p-caco3-lit: #FFFFFF;  --p-caco3-dim: #8E8878;
+
+  /* Boiling. A bubble is a pocket of vapour, so it reads lighter than the
+     water it rises through, with a bright cap where the light catches it.
+     Tuned against the placeholder water; re-check when the render lands. */
+  --bubble:     #CFE4FA;
+  --bubble-lit: #FFFFFF;
+
+  --display-bg:    #17202B;
+  --display-ink:   #F4C152;
+  --display-soft:  #D9C9A0;
+  --display-bezel: #2F3134;
+
+  /* Unlit LEDs: a dim version of the substance colour, per station. */
+  --led-off-sugar: #4B2620;  --led-off-sugar-rim: #5E3027;
+  --led-off-caco3: #3B3B38;  --led-off-caco3-rim: #4C4C48;
+
+  --lens-bg:   #0F1D2E;       /* the dark field inside the viewport */
+  --lens-hair: #2A3E57;       /* etched crosshair and barrel ticks */
+  --engrave:   #C8CCC0;       /* engraved panel lettering */
+
+  --under-bench: #0C0D0E;     /* the shadow under the front edge of the bench */
+
+  --note-paper: #FBF8F0;
+  --note-rule:  #D9E3EE;
+  --note-ink:   #26405C;      /* objectives and observations, blue-black */
+  --note-ink-2: #8A3A2A;      /* challenges, a second pen */
+  --note-faint: #9AA7B4;
+
+  --key-focus: #F4C152;
+
+  /* The keycap finish, matched to the art in docs/sketches so a control
+     drawn in code sits in the same row as one that is a rendered cap. */
+  --cap-face: #BDB7A8;
+  --cap-edge: #8A8474;
+  --cap-ink:  #1F1E1B;
+
+  /* A slot milled into the console, and the actuator that rides in it. */
+  --console-face: #D8CFB8;    /* the surface the channel is cut into */
+  --channel:      #211E1A;    /* the cut itself, in shadow */
+  --fader:        #2B2723;    /* the actuator, dark against the panel */
+  --fader-lit:    #5E584E;    /* where the knurling catches the light */
+
+  /* Light on the back wall: a little from above, falling away into the joint
+     with the counter, so the tiling reads as a lit wall rather than as a flat
+     fill. Laid over the tile in both copies of the wall at the same stage
+     geometry, or the two would disagree at the edge of the stage. It stops at
+     883, where the skirting starts and the wall stops being visible. */
+  /* How far a line behind the glass is raised by the water in front of it. */
+  --refract: -3px;
+
+  --wall-light: linear-gradient(to bottom,
+      rgb(255 255 255 / .075) 0%,
+      rgb(255 255 255 / 0) 34%,
+      rgb(0 0 0 / .035) 62%,
+      rgb(0 0 0 / .115) 100%);
+
+  /* The bench lip's tile, in stage points: the shipped texture is 1536 x 319
+     at the usual 2x, and it is seamless sideways only. Named once because the
+     bleed and the in-stage copy both tile it and a disagreement between them
+     would show as a step at the edge of the stage. */
+  --bench-tile: 768px 159.5px;
+
+  /* The one vertical rhythm that is shared with the art: the notebook's
+     ruled lines, so handwriting sits on them instead of floating. */
+  --rule-gap: 37px;
+  --rule-first: 500px;        /* first rule, from the top of notebook-text */
+}
+
+/* This instrument has one appearance. The kit ships a dark plate and a light
+   paper stock; neither applies to a beige console on a grey tiled wall, and
+   the spec drops dark mode outright. */
+html {
+  color-scheme: light;
+  background: #15171A;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #15171A;
+  font-family: var(--font);
+  /* A dragged finger should move the stir knob, never the page. */
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* --------------------------------------------------------------------------
+   Bleed: wall, trim and bench, past the safe area in whatever direction the
+   screen has room. The tile grid starts at the safe area's origin so the
+   wall behind the instrument lines up with the wall beside it.
+   -------------------------------------------------------------------------- */
+
+.bleed { position: fixed; inset: 0; z-index: 0; }
+.bleed > * { position: absolute; }
+
+.bleed__wall {
+  inset: 0;
+  background-image: var(--wall-light), var(--img-wall);
+  background-size: 100% calc(883px * var(--s)), calc(100px * var(--s));
+  background-position: 0 var(--oy), var(--ox) var(--oy);
+  background-repeat: no-repeat, repeat;
+}
+
+.bleed__trim {
+  left: 0; right: 0;
+  top: calc(var(--oy) + 883px * var(--s));
+  height: calc(63px * var(--s));
+  background-image: var(--img-wall-trim);
+  background-repeat: repeat-x;
+  /* Width only: the band's height is the gap between the wall and the
+     counter, so the tile is stretched to it and the width is what keeps the
+     bullnose in proportion. 217 x 63 is the texture's own aspect. */
+  background-size: calc(194px * var(--s)) 100%;
+  background-position-x: var(--ox);
+}
+
+/* The bench is a ledge, not a wall: its tile runs sideways only, and
+   everything below the front edge is the unlit space under the bench. Tiling
+   it downwards instead put a lit edge across the floor every 37 points.
+
+   Its top is 946, which is where the stir plate's feet and the stand's pole
+   both end, so the instrument stands on the counter instead of hovering 17
+   points above it. The trim moves up with it, keeping its own height, because
+   it is the joint between the wall and the counter and has to stay on it. */
+.bleed__bench {
+  left: 0; right: 0;
+  top: calc(var(--oy) + 946px * var(--s));
+  bottom: 0;
+  background-color: var(--under-bench);
+  background-image: var(--img-bench);
+  background-repeat: repeat-x;
+  /* The tile scales with the stage, so the lip meets the one drawn inside it. */
+  background-size: calc(768px * var(--s)) calc(159.5px * var(--s));
+  background-position-x: var(--ox);
+}
+
+/* The bleed again, in stage points, so that layers set to multiply have
+   something of their own to blend against — see instrument.js. Same images,
+   same 100-point grid, so it meets the bleed with no seam. */
+
+.ground { position: absolute; inset: 0; z-index: 0; }
+.ground > * { position: absolute; left: 0; right: 0; }
+
+.ground__wall {
+  top: 0;
+  bottom: 0;
+  background-image: var(--wall-light), var(--img-wall);
+  background-size: 1600px 883px, 100px;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat, repeat;
+}
+
+.ground__trim {
+  top: 883px;
+  height: 63px;
+  background-image: var(--img-wall-trim);
+  background-repeat: repeat-x;
+  background-size: 194px 100%;
+}
+
+.ground__bench {
+  top: 946px;
+  bottom: 0;
+  background-color: var(--under-bench);
+  background-image: var(--img-bench);
+  background-repeat: repeat-x;
+  background-size: var(--bench-tile);
+}
+
+/* --------------------------------------------------------------------------
+   The stage. 1600 x 1000 points, scaled about its own top-left corner, which
+   is placed at the offsets JS works out. Everything inside is in points.
+   -------------------------------------------------------------------------- */
+
+.stage {
+  position: fixed;
+  left: var(--ox); top: var(--oy);
+  width: 1600px; height: 1000px;
+  transform: scale(var(--s));
+  transform-origin: 0 0;
+  z-index: 1;
+}
+
+.layer {
+  position: absolute;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* Rasters are decoration; the instrument's meaning is in the real buttons,
+   the displays and the live region. Keycaps are rasters too, and they are
+   not decoration. */
+.layer[data-render^="raster"]:not(button) { pointer-events: none; }
+
+/* Anything identifiable takes the pointer back, so hovering a beaker or a
+   stir plate can name it. */
+.layer[data-id] { pointer-events: auto; }
+
+/* --------------------------------------------------------------------------
+   Displays. Offsets inside each cut-out come from the sketches; the cut-out
+   boxes themselves come from the manifest.
+   -------------------------------------------------------------------------- */
+
+.display {
+  background: var(--display-bg);
+  border: 5px solid var(--display-bezel);
+  border-radius: 9px;
+  font-family: var(--font-mono);
+  color: var(--display-ink);
+  overflow: hidden;
+}
+
+.display__name,
+.display__desc { position: absolute; left: 24px; right: 14px; }
+
+.display__name {
+  top: 38px;
+  font-size: 22px; font-weight: 600; letter-spacing: .8px;
+  text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.display__desc {
+  top: 70px;
+  font-size: 17px; font-weight: 400;
+  color: var(--display-soft);
+  line-height: 1.22;
+}
+
+.clock { text-align: center; }
+.clock__value {
+  position: absolute; left: 0; right: 0; top: 30px;
+  font-size: 32px; font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.clock__label {
+  position: absolute; left: 0; right: 0; top: 72px;
+  font-size: 13px; letter-spacing: 1.3px; opacity: .75;
+}
+
+.counter {
+  display: flex; align-items: baseline; justify-content: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.counter__n { font-size: 30px; font-weight: 600; line-height: 45px; }
+.counter__of { font-size: 15px; opacity: .75; }
+
+/* --------------------------------------------------------------------------
+   Register: one LED per particle, 5 across and 10 down.
+   -------------------------------------------------------------------------- */
+
+.leds {
+  display: grid;
+  grid-template-columns: repeat(5, 15px);
+  grid-auto-rows: 15px;
+  gap: 7.5px;
+}
+
+/* The lamp itself is art — a socket, a dim body, a hot core when lit — and
+   only the halo is drawn here, because a glow has to stay crisp at whatever
+   size the stage is scaled to. */
+.led {
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  background: var(--led-off-img) center / 100% 100% no-repeat;
+  transition: box-shadow 160ms linear;
+}
+
+.led.is-lit {
+  background-image: var(--led-on-img);
+  box-shadow: 0 0 6px var(--led-on), 0 0 14px var(--led-glow);
+}
+
+/* The two image vars are set by instrument.js, so the lamps follow whichever
+   asset set is loaded instead of naming a folder here. */
+[data-station="sugar"] {
+  --led-off-img: var(--img-led-sugar-off);
+  --led-on-img:  var(--img-led-sugar-on);
+  --led-on:  var(--led-sugar-lit);
+  --led-glow: color-mix(in srgb, var(--led-sugar-lit) 55%, transparent);
+}
+
+[data-station="caco3"] {
+  --led-off-img: var(--img-led-caco3-off);
+  --led-on-img:  var(--img-led-caco3-on);
+  --led-on:  var(--p-caco3);
+  --led-glow: color-mix(in srgb, var(--p-caco3) 55%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   Keycaps. The art carries the whole key, so the button is the image: one
+   file up, one file down.
+   -------------------------------------------------------------------------- */
+
+.key {
+  appearance: none;
+  padding: 0; margin: 0;
+  border: 0; border-radius: 6px;
+  background: var(--key-up) no-repeat center / 100% 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.key.is-down { background-image: var(--key-down); }
+/* Dimmed, not hidden: the cap is still there to be read and identified, it
+   just has nothing to give yet. The fade is what makes it read as recovering
+   rather than as a light being switched. */
+.key[aria-disabled="true"] { cursor: default; opacity: 0.45; }
+.key { transition: opacity 200ms ease-out; }
+
+/* Fingers are wider than keycaps. The gaps between the caps are 8 points
+   sideways and 10 down, so this much extra never reaches a neighbour. */
+.key::before {
+  content: "";
+  position: absolute; inset: -4px;
+  border-radius: 10px;
+}
+
+.key:focus-visible {
+  outline: none;
+}
+
+/* A lit outline around the cap, which suits an instrument better than a
+   browser focus ring. */
+.key:focus-visible::after {
+  content: "";
+  position: absolute; inset: -3px;
+  border: 2.5px solid var(--key-focus);
+  border-radius: 9px;
+  box-shadow: 0 0 9px var(--key-focus);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Viewports. The engine's canvas, a dry-pile frame over it for the states
+   with no water in the beaker, and the scale bar on its own dark plate.
+   -------------------------------------------------------------------------- */
+
+.viewport { border-radius: 50%; overflow: hidden; }
+
+.viewport__live,
+.viewport__dry {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+}
+
+/* The dry frame sits over the live canvas and is wiped away as water arrives,
+   bottom-up, then wiped back top-down as the beaker drains. It is second in
+   the DOM, which is all it needs: a z-index here would escape, because
+   `.layer` is positioned with z-index auto and so is no stacking context, and
+   the frame would paint over glass-viewport-{s} as well. That is what used to
+   take the cover glass away in every state but one. The scale bar below keeps
+   its z-index on purpose — it is meant to be readable through the glass. */
+
+/* The cover glass is a reflection, so it is simply there, in every state the
+   field can be in. One that comes and goes reads as a fault rather than as
+   optics. The one time it lifts is Freeze. 220ms, because past about 200 the
+   change reads as glass lifting rather than as a cut, and past about 300 a
+   student waiting to read the field is waiting. */
+.layer[data-layer^="glass-viewport"] {
+  transition: opacity 220ms var(--ease-out);
+}
+
+.is-frozen .layer[data-layer^="glass-viewport"] { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .layer[data-layer^="glass-viewport"] { transition: none; }
+}
+
+.scalebar {
+  position: absolute;
+  z-index: 3;
+  background: var(--lens-bg);
+  border-radius: 3px;
+  padding: 2px 6px 4px;
+  text-align: center;
+  pointer-events: auto;
+}
+
+.scalebar__label {
+  display: block;
+  font: 600 11px/1.3 var(--font-mono);
+  color: #fff;
+}
+
+/* --nm-bar is the true 1 nm span, set from the model's own geometry. One
+   tick is added to it so the distance between the serif CENTRES is 1 nm:
+   each end carries half a tick outside the span it marks. */
+.scalebar__bar {
+  --tick: 1.8px;
+  display: block;
+  width: calc(var(--nm-bar) + var(--tick));
+  height: 9px;
+  border-left: var(--tick) solid #fff;
+  border-right: var(--tick) solid #fff;
+  position: relative;
+}
+
+.scalebar__bar::after {
+  content: "";
+  position: absolute; left: 0; right: 0; top: 50%;
+  border-top: 1.8px solid #fff;
+}
+
+/* --------------------------------------------------------------------------
+   Masked layers. Water, the cloud inside it and the powder mound are each
+   shipped at full strength and revealed by code; none of them is ever
+   swapped for another image.
+   -------------------------------------------------------------------------- */
+
+/* --water-clip is a polygon whose top edge is the liquid surface, dipped in
+   the middle while the stir bar is spinning. */
+.water,
+.turbidity { clip-path: var(--water-clip, inset(0 0 100% 0)); }
+.refract    { clip-path: var(--water-clip, inset(0 0 100% 0)); }
+
+/* The skirting again, shifted sideways so its tile lands over the real one
+   and then lifted by --refract. Only the lift is visible, because everything
+   outside the water's own outline is clipped away.
+
+   One band, at this layer's size rather than the stage's. Refraction needs an
+   edge to bend and this is the only one the water crosses, so there is
+   nothing else in here: a near-uniform wall has no edge to move, and moving
+   its tile seams instead just looks broken.
+
+   3 points is a little over two screen pixels at 1366 — enough to read as a
+   step, small enough that nobody reads it as a fault. */
+.refract__trim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(883px - var(--gy) + var(--refract));
+  height: 63px;
+  background-image: var(--img-wall-trim);
+  background-repeat: repeat-x;
+  background-size: 194px 100%;
+  background-position-x: calc(-1 * var(--gx));
+  /* The clip polygon is the waterline, not the glass. It spans the full
+     layer box, so without this the lifted skirting ran 20 points past each
+     wall and hung in the air beside the beaker. The sides come from the
+     water texture's own bounds, measured into geometry.json. */
+  clip-path: inset(0 var(--wr) 0 var(--wl));
+}
+
+/* Normal, not screen. Screen can only lighten, so a cloudy beaker used to end
+   up brighter than the wall behind it — a glass of milk that glows. Suspended
+   solid blocks light, it does not emit it, and dropping the blend also stops
+   the compositor reading the backdrop for this layer every frame. */
+.turbidity { opacity: 0; }
+
+/* The mound grows from the beaker floor as powder falls and flattens as it
+   dissolves, so it scales rather than being cropped: no measurement of the
+   art, and the silhouette stays a mound at every size. */
+.pile {
+  transform: translateX(var(--shake, 0px)) scaleY(var(--pile, 1));
+  transform-origin: 50% 100%;
+}
+
+/* --------------------------------------------------------------------------
+   The boil.
+
+   The bubbles are children of the water layer, so the water's own clip-path
+   is the surface they burst at: nothing is ever drawn above the waterline,
+   and the level falling as the beaker boils dry confines them without a
+   second mask. The beaker glass multiplies over them, so they are inside the
+   glass like everything else in there.
+
+   --boil is written on the stage, 0 to 1, as the water comes to the boil.
+   --rise is the water column at full level and --floor is the glass below it,
+   both set from the same geometry the surface is drawn from, so no coordinate
+   lives here. Transform and opacity only: this runs for half a minute at a
+   time on a Chromebook.
+   -------------------------------------------------------------------------- */
+
+.water__boil {
+  position: absolute;
+  inset: 0;
+  opacity: var(--boil, 0);
+  /* Reset interrupts a boil, and a beaker full of bubbles should not vanish
+     between one frame and the next. */
+  transition: opacity 200ms linear;
+}
+
+.bubble {
+  position: absolute;
+  left: var(--bx);
+  bottom: var(--floor, 0px);     /* the beaker's floor, not the box's */
+  width: var(--bw);
+  height: var(--bw);
+  margin-left: calc(var(--bw) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%,
+    var(--bubble-lit) 0 22%,
+    color-mix(in srgb, var(--bubble) 45%, transparent) 55%,
+    var(--bubble) 78%, transparent 84%);
+  animation: boil-rise var(--bt) linear var(--bd) infinite;
+}
+
+/* Born small on the floor, growing as the water above it thins, pushed about
+   on the way up, and gone just under the surface rather than sliced off at it. */
+@keyframes boil-rise {
+  0%   { transform: translate(0, 0) scale(.5); opacity: 0; }
+  12%  { opacity: 1; }
+  50%  { transform: translate(2px, calc(var(--rise) * -.5)) scale(1); }
+  85%  { opacity: 1; }
+  100% { transform: translate(-2px, calc(var(--rise) * -1)) scale(1.25); opacity: 0; }
+}
+
+/* Freeze holds the model, so it holds the boil: every bubble stops where it
+   is rather than the beaker carrying on without the clock. */
+.is-frozen .bubble { animation-play-state: paused; }
+
+/* --------------------------------------------------------------------------
+   Sprite sheets: frames side by side in one WebP, stepped by background
+   position. Not video — Safari has no transparent WebM.
+   -------------------------------------------------------------------------- */
+
+.sprite {
+  background-repeat: no-repeat;
+  /* --frames and --frame-w come from the sheet; --frame is the current one. */
+  background-size: calc(var(--frame-w) * var(--frames)) 100%;
+  background-position-x: calc(-1 * var(--frame-w) * var(--frame, 0));
+  background-position-y: 0;
+}
+
+/* The stream hangs from the nozzle and ends at the water surface, so it is
+   cropped from the bottom as the level rises. */
+.sprite--pour { background-position-y: 0; }
+
+/* --------------------------------------------------------------------------
+   Lab notebook.
+   -------------------------------------------------------------------------- */
+
+.notebook {
+  font-family: var(--font-hand);
+  color: var(--note-ink);
+  font-size: 20px;
+  line-height: 1.14;
+}
+
+/* The lists own the page above the first ruled line, and no more than that. */
+.notebook__top {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: calc(var(--rule-first) - 54px);
+  overflow: hidden;
+}
+
+/* Written, not typeset: these are headings in a student's own notebook. */
+.notebook__head {
+  font: 400 27px/1 var(--font-hand);
+  color: var(--note-ink);
+  margin: 0 0 7px;
+}
+
+.notebook__head--challenges { color: var(--note-ink-2); }
+
+.notebook__list { list-style: none; margin: 0 0 12px; padding: 0; }
+
+.notebook__item {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: start;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+/* Objectives take a square box, challenges a diamond in the second pen, so
+   the two lists are never told apart by colour alone. */
+.notebook__mark {
+  width: 15px; height: 15px;
+  margin-top: 5px;
+  border: 2px solid currentColor;
+}
+
+.notebook__item--challenge {
+  color: var(--note-ink-2);
+}
+
+.notebook__item--challenge .notebook__mark {
+  transform: rotate(45deg) scale(.86);
+}
+
+.notebook__text { position: relative; }
+
+.notebook__item.is-done .notebook__text::after {
+  content: "";
+  position: absolute;
+  left: -2px; right: -2px; top: 52%;
+  border-top: 2px solid currentColor;
+  transform: scaleX(var(--struck, 1));
+  transform-origin: 0 50%;
+}
+
+/* A drawn tick, rather than a glyph from a font that may not have one. */
+.notebook__item.is-done .notebook__mark {
+  position: relative;
+}
+
+.notebook__item.is-done .notebook__mark::after {
+  content: "";
+  position: absolute;
+  left: 1px; top: -4px; width: 7px; height: 12px;
+  border: solid currentColor;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(40deg);
+}
+
+.notebook__item--challenge.is-done .notebook__mark::after {
+  transform: rotate(-5deg);
+}
+
+/* Predictions: tappable, and large enough to tap. */
+.notebook__choices { display: flex; gap: 8px; margin: 4px 0 2px; }
+
+.notebook__choice {
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  /* The kit's tap target, in stage points like every other control here. */
+  min-height: var(--tap);
+  min-width: 60px;
+  padding: 2px 14px;
+  background: transparent;
+  border: 2px solid currentColor;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.notebook__choice.is-picked {
+  background: currentColor;
+}
+
+.notebook__choice.is-picked span { color: var(--note-paper); }
+
+/* Observations are written on the paper's own ruled lines: the line box is
+   one rule tall, and the list is lifted so the writing sits on the rule
+   rather than under it. A long note runs onto the next rule, as it would on
+   paper, instead of being cut off. */
+.notebook__head--obs {
+  position: absolute;
+  top: calc(var(--rule-first) - 48px);
+}
+
+/* The ruling is drawn here rather than printed on the paper, from the same
+   two numbers that set the writing's rhythm — so a line and the words
+   sitting on it cannot drift apart. */
+.notebook__obs {
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(var(--rule-first) - 23px);
+  bottom: 0;
+  margin: 0; padding: 0;
+  list-style: none;
+  overflow: hidden;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0, transparent calc(var(--rule-gap) - 1.3px),
+    var(--note-rule) calc(var(--rule-gap) - 1.3px), var(--note-rule) var(--rule-gap));
+  background-position: 0 23px;
+}
+
+.notebook__obs li { line-height: var(--rule-gap); }
+
+/* --------------------------------------------------------------------------
+   Portrait, boot failure, and the developer layer view.
+   -------------------------------------------------------------------------- */
+
+.rotate {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 50;
+  margin: 0;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+  background: #D8CFB8;
+  color: #1F1E1B;
+  font-family: var(--font);
+  padding: 8vw;
+}
+
+.rotate b { font-size: 28px; font-weight: 600; letter-spacing: .02em; }
+.rotate span:last-child { font-size: 18px; color: #4A463C; max-width: 22em; }
+
+/* A phone, turning. */
+.rotate__glyph {
+  width: 86px; height: 86px;
+  border: 5px solid #1F1E1B;
+  border-radius: 12px;
+  animation: rotate-hint 2.6s var(--ease-in-out) infinite;
+}
+
+@keyframes rotate-hint {
+  0%, 30%   { transform: rotate(0deg)   scale(.72, 1); }
+  60%, 100% { transform: rotate(-90deg) scale(.72, 1); }
+}
+
+@media (orientation: portrait) {
+  .rotate { display: grid; }
+  .bleed, .stage { visibility: hidden; }
+}
+
+.boot {
+  position: fixed; inset: auto 0 0 0;
+  z-index: 60; margin: 0; padding: 14px 18px;
+  background: #3A1D18; color: #FFD9CF;
+  font: 400 15px/1.45 var(--font-mono);
+}
+
+/* Backtick with ?debug in the URL: outline every layer and name it, so a
+   fresh render can be checked against the manifest. */
+.is-debug .layer {
+  outline: 1px solid rgba(255, 60, 60, .8);
+}
+
+.is-debug .layer::before {
+  content: attr(data-layer);
+  position: absolute; left: 0; top: 0;
+  z-index: 40;
+  font: 600 9px/1.3 var(--font-mono);
+  color: #fff;
+  background: rgba(190, 20, 20, .92);
+  padding: 0 3px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion: the state changes stay, the decoration goes. Water still
+   arrives and the register still fills; the stream, the falling powder, the
+   vortex and the LED cascade stop drawing attention to themselves.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .rotate__glyph { animation: none; }
+  .led { transition: none; }
+  .key { transition: none; }
+  .sprite--pour,
+  .sprite--powder { opacity: .55; }
+
+  /* The bubbles stop where their own delays put them, which is a scatter up
+     the column: the water still reads as boiling and nothing moves. Same .55
+     as the stream and the grains above. */
+  .bubble { animation-play-state: paused; }
+  .water__boil { opacity: calc(var(--boil, 0) * .55); transition: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Print, for a student who was absent. One landscape page: the instrument as
+   it stands, with the notebook readable.
+   -------------------------------------------------------------------------- */
+
+@page { size: landscape; margin: 10mm; }
+
+@media print {
+  html, body { background: #fff; overflow: visible; height: auto; }
+  .bleed, .rotate, .boot { display: none !important; }
+  .stage {
+    position: static;
+    transform: scale(var(--print-s, .62));
+    transform-origin: 0 0;
+    /* Pull back the space the unscaled box would otherwise reserve. */
+    margin-bottom: calc(-1000px * (1 - var(--print-s, .62)));
+  }
+  .viewport__dry, .layer[data-render="raster-overlay"] { display: none; }
+  .key:focus-visible::after { display: none; }
+
+  /* A browser does not print background colours, so the displays would come
+     out as pale amber on bare paper — and the glass rasters that would have
+     sat behind them are hidden by the rule above. On paper they are ink in a
+     ruled box instead. This is the whole family, not just the temperature:
+     the clock and the description panel read the same way. */
+  .display {
+    background: none;
+    color: var(--cap-ink);
+    border-color: color-mix(in srgb, var(--cap-ink) 45%, transparent);
+    box-shadow: none;
+  }
+  .display__desc, .heat__name, .heat__boil { color: var(--cap-ink); opacity: 1; }
+  .heat__digits { text-shadow: none; }
+
+  /* Paper cannot show a lamp as unlit, so an unlit one is simply not there. */
+  [data-layer="heat"]:not([data-boiling="true"]) .heat__boil { visibility: hidden; }
+}
+
+
+
+/* --------------------------------------------------------------------------
+   Water temperature. A slide switch: a channel milled across the console face
+   with a knurled actuator riding in it, the way the hardware this instrument
+   is pretending to be actually works. The layer has no background of its own
+   — what shows through is the console art, which is the surface the channel
+   is cut into.
+
+   Two parts on one line, both on the centreline the keys beside it sit on:
+   the readout, then the slot. The temperature is shown on a screen, because a
+   panel engraving does not change — and its legend is printed on the glass,
+   because a nameplate above the screen would push the screen off that line.
+   There is no lit bar in the slot: a slot is a hole, and light does not come
+   out of one.
+   -------------------------------------------------------------------------- */
+
+[data-layer="heat"] {
+  background: none;
+  cursor: ew-resize;
+  touch-action: none;           /* the drag belongs to the control */
+  -webkit-user-select: none;
+  user-select: none;
+  --at: 0;
+}
+
+[data-layer="heat"]:focus-visible {
+  outline: 2px solid var(--key-focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* The readout: the same glass, bezel and amber as the instrument's other
+   displays, in a smaller part set flush into the console. Its own centre is
+   the panel's, which is the centre of the key beside it.
+
+   The legend is printed on the glass rather than engraved in the panel. That
+   is the price of the alignment — there is no room for a nameplate above the
+   screen and a screen on the centreline — and it is what a printed legend on
+   a real display does anyway. */
+.heat__screen {
+  position: absolute;
+  left: 4px;
+  top: 3px;
+  bottom: 3px;
+  width: 92px;              /* sized by '100 °C': 68.4 points, inside 74 */
+  box-sizing: border-box;
+  border-width: 2px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 0 7px;
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / .62),
+    0 1px 0 rgb(255 255 255 / .45);
+}
+
+/* Silkscreen on the glass: the name, and the lamp pushed to the far side. */
+.heat__legend {
+  display: flex;
+  align-items: center;
+}
+
+.heat__name {
+  font: 600 10px/1 var(--font);
+  letter-spacing: 1.6px;
+  color: var(--display-soft);
+  opacity: .8;
+}
+
+.heat__digits {
+  font: 600 19px/1 var(--font-mono);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 6px color-mix(in srgb, var(--display-ink) 60%, transparent);
+}
+
+/* An indicator lamp behind the same glass. Dark rather than absent when it is
+   not lit, the way a dead segment on a real readout still shows. */
+.heat__boil {
+  margin-left: auto;
+  font: 700 8px/1 var(--font);
+  font-style: normal;
+  letter-spacing: 1px;
+  color: var(--solute);
+  opacity: .2;
+}
+
+[data-layer="heat"][data-boiling="true"] .heat__boil {
+  opacity: 1;
+  text-shadow: 0 0 7px var(--solute);
+}
+
+/* The channel. Lit from above, so the near wall is in shadow and the face
+   carries a bright lip along the cut. Centred on the panel, which puts it on
+   the same line as the middle of the key beside it. */
+.heat__track {
+  position: absolute;
+  /* Inset by half the actuator, so the throw stops inside the panel rather
+     than running over the edge of it. */
+  left: 110px;
+  right: 14px;
+  top: 50%;
+  height: 14px;
+  margin-top: -7px;
+  background: var(--channel);
+  border-radius: 3px;
+  box-shadow:
+    inset 0 3px 5px rgb(0 0 0 / .72),
+    inset 0 -1px 0 rgb(255 255 255 / .10),
+    0 1px 0 rgb(255 255 255 / .5);
+}
+
+/* The three the lesson compares, scribed on the face under the cut. */
+.heat__mark {
+  position: absolute;
+  bottom: -6px;
+  width: 1.5px;
+  height: 5px;
+  margin-left: -0.75px;
+  background: color-mix(in srgb, var(--cap-ink) 45%, transparent);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .4);
+}
+
+/* The actuator: a knurled grip standing proud of the face on both sides of
+   the cut and casting onto it, like the switch it is drawn from. */
+.heat__thumb {
+  position: absolute;
+  left: calc(var(--at) * 100%);
+  top: 50%;
+  width: 20px;
+  height: 32px;
+  margin: -16px 0 0 -10px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--fader) 0%,
+    var(--fader-lit) 22%,
+    var(--fader) 50%,
+    var(--fader-lit) 78%,
+    var(--fader) 100%);
+  box-shadow:
+    0 3px 4px rgb(0 0 0 / .5),
+    inset 0 1px 0 rgb(255 255 255 / .22);
+}
+
+/* Horizontal knurling across the grip. */
+.heat__thumb::after {
+  content: '';
+  position: absolute;
+  inset: 4px 2px;
+  background: repeating-linear-gradient(
+    180deg,
+    rgb(255 255 255 / .22) 0 1px,
+    transparent 1px 4px);
+}

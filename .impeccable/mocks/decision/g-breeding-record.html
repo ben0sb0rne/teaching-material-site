@@ -1,0 +1,211 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Breeding Record</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1366px;height:768px;overflow:hidden}
+body{background:#EDE8DC;color:#0E141A;font:400 15px/1.35 Jost,system-ui,sans-serif;display:flex;flex-direction:column}
+.hd{height:54px;display:flex;align-items:center;gap:22px;padding:0 24px;border-bottom:1px solid #6E7C8A;flex:0 0 auto}
+.ttl{font-size:19px}.ttl b{color:#7A5A00;font-weight:500}
+.instr{font-size:17px}
+.gen{margin-left:auto;font:600 12px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;color:#46525F}
+.wrap{flex:1;padding:0 20px;min-height:0}
+.wrap svg{display:block;width:1326px;height:588px}
+text{text-anchor:middle}
+.card{fill:#F7F3E9;stroke:#6E7C8A;stroke-width:1}
+.card.gh{fill:none;stroke-dasharray:4 4}
+.hair{stroke:#BFC7CF;stroke-width:1}
+.wedge{fill:#A79F8E;stroke:#6E7C8A;stroke-width:1}
+.arrow{fill:#FFFDF6;stroke:#6E7C8A;stroke-width:1}
+.offs{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.16em;fill:#0E141A;text-anchor:start;text-transform:uppercase}
+.sx{font:400 26px Jost,sans-serif;fill:#0E141A}
+.gn{font:600 15px 'IBM Plex Mono',monospace;fill:#7A5A00}
+/* alleles never pass through text-transform: F and f are different alleles */
+.al{font:600 15px 'IBM Plex Mono',monospace;letter-spacing:.08em;fill:#0E141A;text-transform:none}
+.nm{font:400 11px Jost,sans-serif;fill:#46525F}
+.code{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.14em;fill:#7A5A00;text-transform:none}
+.gl{font:600 15px 'IBM Plex Mono',monospace;fill:#7A5A00;text-anchor:start}
+.ctbox{fill:none;stroke:#6E7C8A;stroke-width:1}
+.ctl{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;fill:#46525F;text-transform:uppercase}
+.ctn{font:600 18px 'IBM Plex Mono',monospace;fill:#0F6340}
+.ctg{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.06em;fill:#46525F;text-transform:uppercase}
+.ctv{font:600 12px 'IBM Plex Mono',monospace;fill:#46525F;text-transform:uppercase}
+.grule{stroke:#6E7C8A;stroke-width:1}
+.hd2{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.14em;fill:#46525F;text-anchor:end;text-transform:uppercase}
+.hd3{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.14em;fill:#46525F;text-transform:uppercase}
+.foot{flex:0 0 62px;display:flex;align-items:center;gap:12px;padding:0 24px;border-top:1px solid #6E7C8A}
+.flbl{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#46525F;text-transform:uppercase}
+.sp{flex:1}
+.btn{height:48px;padding:0 26px;background:#F5C518;color:#0E141A;font:500 15px/48px Jost,sans-serif}
+.btn2{height:48px;padding:0 22px;border:1px solid #6E7C8A;font:400 15px/46px Jost,sans-serif}
+
+.key{position:relative}
+.key summary{height:48px;min-width:72px;padding:0 20px;border:1px solid #6E7C8A;
+  font:400 15px/46px Jost,sans-serif;text-align:center;cursor:pointer;list-style:none}
+.key summary::-webkit-details-marker{display:none}
+.key[open] summary{background:#FFFDF6}
+.kp{position:absolute;bottom:calc(100% + 10px);left:0;width:714px;padding:16px 20px;
+  background:#F7F3E9;border:1px solid #6E7C8A;display:flex;gap:28px}
+.kp>div:nth-child(1){flex:0 0 96px}
+.kp>div:nth-child(2){flex:0 0 210px}
+.kp>div:nth-child(3){flex:1}
+.kh{display:block;margin-bottom:7px;font:600 12px 'IBM Plex Mono',monospace;
+  letter-spacing:.1em;color:#46525F;text-transform:uppercase}
+.kp p{margin:3px 0;font:400 13px/1.5 Jost,sans-serif;color:#0E141A}
+/* alleles never pass through text-transform: F and f are different alleles */
+.kp .al{font:600 15px 'IBM Plex Mono',monospace;text-transform:none}
+.kp .al.d{color:#14537B}.kp .al.r{color:#8E2A20}
+.kp .sym{font-size:17px;color:#0E141A}</style></head><body>
+
+<svg width="0" height="0" style="position:absolute"><g id="dogshapes">
+<rect x="60" y="78" width="10" height="28" rx="4" fill="#8E6338"/><rect x="110" y="78" width="10" height="28" rx="4" fill="#8E6338"/>
+<rect x="48" y="50" width="90" height="38" rx="19" fill="#B4875A"/>
+<rect x="72" y="80" width="11" height="28" rx="4" fill="#B4875A"/><rect x="122" y="80" width="11" height="28" rx="4" fill="#B4875A"/>
+<rect x="44" y="38" width="24" height="34" rx="11" fill="#B4875A"/><circle cx="40" cy="36" r="17" fill="#B4875A"/>
+<rect x="12" y="35" width="30" height="16" rx="8" fill="#B4875A"/>
+<path d="M134 62 Q153 52 149 31" fill="none" stroke="#B4875A" stroke-width="13" stroke-linecap="round"/>
+<path d="M43 26 Q58 24 58 42 Q58 60 50 62 Q42 60 43 42 Z" fill="#8E6338"/>
+</g><symbol id="dog" viewBox="0 0 160 120">
+<use href="#dogshapes" stroke="#46525F" stroke-width="5" stroke-linejoin="round"/><use href="#dogshapes"/>
+<circle cx="31" cy="31" r="3.2" fill="#fff" stroke="#46525F" stroke-width="1"/><circle cx="30.4" cy="31" r="2" fill="#111"/><circle cx="13" cy="39" r="3.4" fill="#111"/>
+<rect x="47" y="40" width="7" height="26" rx="3" fill="#2F6FD6" stroke="#46525F" stroke-width="1"/></symbol></svg>
+
+<div class="hd"><div class="ttl">Explore <b>Inheritance</b></div>
+<div class="instr">Choose one puppy to keep.</div>
+<div class="gen">F2 &middot; LITTER OF 8</div></div>
+
+<div class="wrap"><svg viewBox="0 0 1326 588">
+<text x="0" y="84" class="gl">P</text>
+<rect x="34" y="26" width="380" height="104" class="card"/><line x1="98" y1="26" x2="98" y2="130" class="hair"/><line x1="308" y1="26" x2="308" y2="130" class="hair"/><text x="66" y="66" class="sx">♀</text><text x="66" y="102" class="gn">P</text><use href="#dog" x="156" y="40" width="92" height="69"/><text x="203" y="123" class="nm">Juno ♀</text><text x="361" y="43" class="al">FF</text><line x1="308" y1="52" x2="414" y2="52" class="hair"/><text x="361" y="69" class="al">SS</text><line x1="308" y1="78" x2="414" y2="78" class="hair"/><text x="361" y="95" class="al">CC</text><line x1="308" y1="104" x2="414" y2="104" class="hair"/><text x="361" y="121" class="al">BB</text>
+<rect x="904" y="26" width="380" height="104" class="card"/><line x1="968" y1="26" x2="968" y2="130" class="hair"/><line x1="1178" y1="26" x2="1178" y2="130" class="hair"/><text x="936" y="66" class="sx">♂</text><text x="936" y="102" class="gn">P</text><use href="#dog" x="1026" y="40" width="92" height="69"/><text x="1073" y="123" class="nm">Bruno ♂</text><text x="1231" y="43" class="al">ff</text><line x1="1178" y1="52" x2="1284" y2="52" class="hair"/><text x="1231" y="69" class="al">ss</text><line x1="1178" y1="78" x2="1284" y2="78" class="hair"/><text x="1231" y="95" class="al">cc</text><line x1="1178" y1="104" x2="1284" y2="104" class="hair"/><text x="1231" y="121" class="al">bb</text>
+<text x="1284" y="19" class="hd2">Parent male</text>
+<rect x="420" y="34" width="478" height="88" class="ctbox"/>
+<line x1="420" y1="58" x2="898" y2="58" class="hair"/>
+<text x="448.22" y="51" class="ctg">Beard</text>
+<text x="434.11" y="75" class="ctv">Yes</text>
+<text x="434.11" y="114" class="ctn">1</text>
+<line x1="448.22" y1="58" x2="448.22" y2="122" class="hair"/>
+<text x="462.33" y="75" class="ctv">No</text>
+<text x="462.33" y="114" class="ctn">1</text>
+<text x="519.113" y="51" class="ctg">Coat</text>
+<line x1="476.44" y1="34" x2="476.44" y2="122" class="grule"/>
+<text x="497.777" y="75" class="ctv">Short</text>
+<text x="497.777" y="114" class="ctn">1</text>
+<line x1="519.113" y1="58" x2="519.113" y2="122" class="hair"/>
+<text x="540.45" y="75" class="ctv">Long</text>
+<text x="540.45" y="114" class="ctn">1</text>
+<text x="658.315" y="51" class="ctg">Curl</text>
+<line x1="561.786" y1="34" x2="561.786" y2="122" class="grule"/>
+<text x="593.962" y="75" class="ctv">Curly</text>
+<text x="593.962" y="114" class="ctn">1</text>
+<line x1="626.138" y1="58" x2="626.138" y2="122" class="hair"/>
+<text x="658.315" y="75" class="ctv">Wavy</text>
+<text x="658.315" y="114" class="ctn">0</text>
+<line x1="690.491" y1="58" x2="690.491" y2="122" class="hair"/>
+<text x="722.667" y="75" class="ctv">Straight</text>
+<text x="722.667" y="114" class="ctn">1</text>
+<text x="826.421" y="51" class="ctg">Colour</text>
+<line x1="754.843" y1="34" x2="754.843" y2="122" class="grule"/>
+<text x="790.632" y="75" class="ctv">Black</text>
+<text x="790.632" y="114" class="ctn">1</text>
+<line x1="826.421" y1="58" x2="826.421" y2="122" class="hair"/>
+<text x="862.211" y="75" class="ctv">Chocolate</text>
+<text x="862.211" y="114" class="ctn">1</text>
+<polygon points="34,137 1284,137 342,169 106,169" class="wedge"/>
+<polygon points="190,137 258,137 224.0,170" class="arrow"/>
+<text x="520" y="186" class="offs">Offspring</text>
+<text x="0" y="234" class="gl">F1</text>
+<rect x="34" y="176" width="380" height="104" class="card"/><line x1="98" y1="176" x2="98" y2="280" class="hair"/><line x1="308" y1="176" x2="308" y2="280" class="hair"/><text x="66" y="216" class="sx">♀</text><text x="66" y="252" class="gn">F1</text><use href="#dog" x="156" y="190" width="92" height="69"/><text x="203" y="273" class="code">YKJH7</text><text x="361" y="193" class="al">Ff</text><line x1="308" y1="202" x2="414" y2="202" class="hair"/><text x="361" y="219" class="al">Ss</text><line x1="308" y1="228" x2="414" y2="228" class="hair"/><text x="361" y="245" class="al">Cc</text><line x1="308" y1="254" x2="414" y2="254" class="hair"/><text x="361" y="271" class="al">Bb</text>
+<rect x="904" y="176" width="380" height="104" class="card"/><line x1="968" y1="176" x2="968" y2="280" class="hair"/><line x1="1178" y1="176" x2="1178" y2="280" class="hair"/><text x="936" y="216" class="sx">♂</text><text x="936" y="252" class="gn">F1</text><use href="#dog" x="1026" y="190" width="92" height="69"/><text x="1073" y="273" class="code">HP9PA</text><text x="1231" y="193" class="al">Ff</text><line x1="1178" y1="202" x2="1284" y2="202" class="hair"/><text x="1231" y="219" class="al">Ss</text><line x1="1178" y1="228" x2="1284" y2="228" class="hair"/><text x="1231" y="245" class="al">Cc</text><line x1="1178" y1="254" x2="1284" y2="254" class="hair"/><text x="1231" y="271" class="al">Bb</text>
+<text x="1284" y="169" class="hd2">Immigrant male</text>
+<rect x="420" y="184" width="478" height="88" class="ctbox"/>
+<line x1="420" y1="208" x2="898" y2="208" class="hair"/>
+<text x="448.22" y="201" class="ctg">Beard</text>
+<text x="434.11" y="225" class="ctv">Yes</text>
+<text x="434.11" y="264" class="ctn">8</text>
+<line x1="448.22" y1="208" x2="448.22" y2="272" class="hair"/>
+<text x="462.33" y="225" class="ctv">No</text>
+<text x="462.33" y="264" class="ctn">0</text>
+<text x="519.113" y="201" class="ctg">Coat</text>
+<line x1="476.44" y1="184" x2="476.44" y2="272" class="grule"/>
+<text x="497.777" y="225" class="ctv">Short</text>
+<text x="497.777" y="264" class="ctn">8</text>
+<line x1="519.113" y1="208" x2="519.113" y2="272" class="hair"/>
+<text x="540.45" y="225" class="ctv">Long</text>
+<text x="540.45" y="264" class="ctn">0</text>
+<text x="658.315" y="201" class="ctg">Curl</text>
+<line x1="561.786" y1="184" x2="561.786" y2="272" class="grule"/>
+<text x="593.962" y="225" class="ctv">Curly</text>
+<text x="593.962" y="264" class="ctn">0</text>
+<line x1="626.138" y1="208" x2="626.138" y2="272" class="hair"/>
+<text x="658.315" y="225" class="ctv">Wavy</text>
+<text x="658.315" y="264" class="ctn">8</text>
+<line x1="690.491" y1="208" x2="690.491" y2="272" class="hair"/>
+<text x="722.667" y="225" class="ctv">Straight</text>
+<text x="722.667" y="264" class="ctn">0</text>
+<text x="826.421" y="201" class="ctg">Colour</text>
+<line x1="754.843" y1="184" x2="754.843" y2="272" class="grule"/>
+<text x="790.632" y="225" class="ctv">Black</text>
+<text x="790.632" y="264" class="ctn">8</text>
+<line x1="826.421" y1="208" x2="826.421" y2="272" class="hair"/>
+<text x="862.211" y="225" class="ctv">Chocolate</text>
+<text x="862.211" y="264" class="ctn">0</text>
+<polygon points="34,287 1284,287 342,319 106,319" class="wedge"/>
+<polygon points="190,287 258,287 224.0,320" class="arrow"/>
+<text x="520" y="336" class="offs">Offspring</text>
+<text x="0" y="384" class="gl">F2</text>
+<rect x="34" y="326" width="380" height="104" class="card"/><line x1="98" y1="326" x2="98" y2="430" class="hair"/><line x1="308" y1="326" x2="308" y2="430" class="hair"/><text x="66" y="366" class="sx">♂</text><text x="66" y="402" class="gn">F2</text><use href="#dog" x="156" y="340" width="92" height="69"/><text x="203" y="423" class="nm">Pepper ♂</text><text x="361" y="343" class="al">Ff</text><line x1="308" y1="352" x2="414" y2="352" class="hair"/><text x="361" y="369" class="al">ss</text><line x1="308" y1="378" x2="414" y2="378" class="hair"/><text x="361" y="395" class="al">Cc</text><line x1="308" y1="404" x2="414" y2="404" class="hair"/><text x="361" y="421" class="al">bb</text>
+<rect x="904" y="326" width="380" height="104" class="card gh"/><line x1="968" y1="326" x2="968" y2="430" class="hair"/><line x1="1178" y1="326" x2="1178" y2="430" class="hair"/><text x="936" y="366" class="sx">♂</text><text x="936" y="402" class="gn">F2</text><text x="1073" y="423" class="nm">enter a mate code</text><text x="1231" y="343" class="al">ff</text><line x1="1178" y1="352" x2="1284" y2="352" class="hair"/><text x="1231" y="369" class="al">Ss</text><line x1="1178" y1="378" x2="1284" y2="378" class="hair"/><text x="1231" y="395" class="al">cc</text><line x1="1178" y1="404" x2="1284" y2="404" class="hair"/><text x="1231" y="421" class="al">Bb</text>
+<text x="1284" y="319" class="hd2">Immigrant male</text>
+<rect x="420" y="334" width="478" height="88" class="ctbox"/>
+<line x1="420" y1="358" x2="898" y2="358" class="hair"/>
+<text x="448.22" y="351" class="ctg">Beard</text>
+<text x="434.11" y="375" class="ctv">Yes</text>
+<text x="434.11" y="414" class="ctn">6</text>
+<line x1="448.22" y1="358" x2="448.22" y2="422" class="hair"/>
+<text x="462.33" y="375" class="ctv">No</text>
+<text x="462.33" y="414" class="ctn">2</text>
+<text x="519.113" y="351" class="ctg">Coat</text>
+<line x1="476.44" y1="334" x2="476.44" y2="422" class="grule"/>
+<text x="497.777" y="375" class="ctv">Short</text>
+<text x="497.777" y="414" class="ctn">5</text>
+<line x1="519.113" y1="358" x2="519.113" y2="422" class="hair"/>
+<text x="540.45" y="375" class="ctv">Long</text>
+<text x="540.45" y="414" class="ctn">3</text>
+<text x="658.315" y="351" class="ctg">Curl</text>
+<line x1="561.786" y1="334" x2="561.786" y2="422" class="grule"/>
+<text x="593.962" y="375" class="ctv">Curly</text>
+<text x="593.962" y="414" class="ctn">2</text>
+<line x1="626.138" y1="358" x2="626.138" y2="422" class="hair"/>
+<text x="658.315" y="375" class="ctv">Wavy</text>
+<text x="658.315" y="414" class="ctn">4</text>
+<line x1="690.491" y1="358" x2="690.491" y2="422" class="hair"/>
+<text x="722.667" y="375" class="ctv">Straight</text>
+<text x="722.667" y="414" class="ctn">2</text>
+<text x="826.421" y="351" class="ctg">Colour</text>
+<line x1="754.843" y1="334" x2="754.843" y2="422" class="grule"/>
+<text x="790.632" y="375" class="ctv">Black</text>
+<text x="790.632" y="414" class="ctn">6</text>
+<line x1="826.421" y1="358" x2="826.421" y2="422" class="hair"/>
+<text x="862.211" y="375" class="ctv">Chocolate</text>
+<text x="862.211" y="414" class="ctn">2</text>
+<polygon points="34,437 1284,437 342,469 106,469" class="wedge"/>
+<polygon points="190,437 258,437 224.0,470" class="arrow"/>
+<text x="520" y="486" class="offs">Offspring</text>
+<text x="0" y="534" class="gl">F3</text>
+<rect x="34" y="476" width="380" height="104" class="card gh"/><line x1="98" y1="476" x2="98" y2="580" class="hair"/><line x1="308" y1="476" x2="308" y2="580" class="hair"/><text x="66" y="516" class="sx">♀</text><text x="66" y="552" class="gn">F3</text><text x="203" y="573" class="nm">choose one</text><text x="361" y="493" class="al">ff</text><line x1="308" y1="502" x2="414" y2="502" class="hair"/><text x="361" y="519" class="al">ss</text><line x1="308" y1="528" x2="414" y2="528" class="hair"/><text x="361" y="545" class="al">cc</text><line x1="308" y1="554" x2="414" y2="554" class="hair"/><text x="361" y="571" class="al">bb</text>
+<text x="66" y="18" class="hd3">Sex</text>
+<text x="203" y="18" class="hd3">Phenotype</text>
+<text x="361" y="18" class="hd3">Genotype</text>
+<text x="659" y="18" class="hd3">Dogs with each trait</text>
+</svg></div>
+
+<div class="foot"><details class="key"><summary>Key</summary><div class="kp">
+  <div><span class="kh">Symbols</span>
+    <p><b class="sym">&#9792;</b> female</p><p><b class="sym">&#9794;</b> male</p></div>
+  <div><span class="kh">Letters</span>
+    <p><b class="al d">F</b> capital &mdash; dominant, one copy shows</p>
+    <p><b class="al r">f</b> lowercase &mdash; recessive, needs both</p></div>
+  <div><span class="kh">This litter&rsquo;s genes</span>
+    <p><b class="al d">F</b><b class="al r">f</b> beard &nbsp; <b class="al d">S</b><b class="al r">s</b> short coat &nbsp; <b class="al d">B</b><b class="al r">b</b> black</p>
+    <p><b class="al d">C</b><b class="al r">c</b> curl &mdash; <b class="al">CC</b> curly, <b class="al">Cc</b> wavy, <b class="al">cc</b> straight</p></div>
+</div></details><span class="flbl">Breeding record &mdash; copy each row to your sheet</span><div class="sp"></div>
+ <div class="btn2">Breed again</div><div class="btn">Keep this puppy</div></div>
+</body></html>

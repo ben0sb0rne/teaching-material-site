@@ -1,0 +1,229 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Breeding Stage</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1366px;height:768px;overflow:hidden}
+body{background:#EDE8DC;color:#0E141A;font:400 15px/1.35 Jost,system-ui,sans-serif;display:flex;flex-direction:column}
+.hd{height:54px;display:flex;align-items:center;gap:22px;padding:0 24px;border-bottom:1px solid #6E7C8A;flex:0 0 auto}
+.ttl{font-size:19px}.ttl b{color:#7A5A00;font-weight:500}
+.instr{font-size:17px}
+.gen{margin-left:auto;font:600 12px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;color:#46525F}
+.wrap{flex:1;padding:0 20px;min-height:0}
+.wrap svg{display:block;width:1326px;height:648px}
+text{text-anchor:middle}
+.lstart{text-anchor:start}
+.lend{text-anchor:end}
+.lbl{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.1em;fill:#46525F;text-transform:uppercase}
+.nml{font:400 15px Jost,sans-serif;fill:#0E141A;text-transform:none}
+.nm{font:400 13px Jost,sans-serif;fill:#0E141A}
+/* alleles never pass through text-transform: F and f are different alleles */
+.al{font:600 17px 'IBM Plex Mono',monospace;fill:#0E141A;text-transform:none}
+.al.d{fill:#14537B}.al.r{fill:#8E2A20}.al.faint{opacity:.45}
+.pair{font:600 13px 'IBM Plex Mono',monospace;fill:#0E141A;text-transform:none}
+.grid{fill:#FFFDF6;stroke:#6E7C8A;stroke-width:1}
+.hair{stroke:#BFC7CF;stroke-width:1}
+.drawn{fill:none;stroke:#7A5A00;stroke-width:2}
+.tile{fill:#FFFDF6;stroke:#6E7C8A;stroke-width:1}
+.tile.dom{stroke:#14537B}.tile.rec{stroke:#8E2A20}
+.tile.faint{opacity:.45}
+.drum{fill:#FFFDF6;stroke:#6E7C8A;stroke-width:2}
+.drumlbl{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.08em;fill:#46525F;text-transform:uppercase}
+.rail{fill:none;stroke:#6E7C8A;stroke-width:1;stroke-dasharray:5 4}
+.gamete{fill:#F7F3E9;stroke:#6E7C8A;stroke-width:1.5}
+.gamlbl{font:600 13px 'IBM Plex Mono',monospace;letter-spacing:.16em;fill:#7A5A00}
+.meet{fill:none;stroke:#7A5A00;stroke-width:2;stroke-dasharray:6 5}
+.path{fill:none;stroke:#6E7C8A;stroke-width:3;stroke-linecap:round;marker-end:url(#ar)}
+.slot{fill:#F7F3E9;stroke:#6E7C8A;stroke-width:1}
+.slot.empty{fill:none;stroke-dasharray:5 5}
+.slotn{font:600 15px 'IBM Plex Mono',monospace;fill:#46525F}
+.foot{flex:0 0 62px;display:flex;align-items:center;gap:12px;padding:0 24px;border-top:1px solid #6E7C8A}
+.flbl{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#46525F;text-transform:uppercase}
+.sp{flex:1}
+.btn{height:48px;padding:0 26px;background:#F5C518;color:#0E141A;font:500 15px/48px Jost,sans-serif}
+.btn2{height:48px;padding:0 22px;border:1px solid #6E7C8A;font:400 15px/46px Jost,sans-serif}
+.key{position:relative}
+.key summary{height:48px;min-width:72px;padding:0 20px;border:1px solid #6E7C8A;
+  font:400 15px/46px Jost,sans-serif;text-align:center;cursor:pointer;list-style:none}
+.key summary::-webkit-details-marker{display:none}
+.key[open] summary{background:#FFFDF6}
+.kp{position:absolute;bottom:calc(100% + 10px);left:0;width:714px;padding:16px 20px;
+  background:#F7F3E9;border:1px solid #6E7C8A;display:flex;gap:28px}
+.kp>div:nth-child(1){flex:0 0 96px}
+.kp>div:nth-child(2){flex:0 0 210px}
+.kp>div:nth-child(3){flex:1}
+.kh{display:block;margin-bottom:7px;font:600 12px 'IBM Plex Mono',monospace;
+  letter-spacing:.1em;color:#46525F;text-transform:uppercase}
+.kp p{margin:3px 0;font:400 13px/1.5 Jost,sans-serif;color:#0E141A}
+/* alleles never pass through text-transform: F and f are different alleles */
+.kp .al{font:600 15px 'IBM Plex Mono',monospace;text-transform:none}
+.kp .al.d{color:#14537B}.kp .al.r{color:#8E2A20}
+.kp .sym{font-size:17px;color:#0E141A}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs><g id="dogshapes">
+<rect x="60" y="78" width="10" height="28" rx="4" fill="#8E6338"/><rect x="110" y="78" width="10" height="28" rx="4" fill="#8E6338"/>
+<rect x="48" y="50" width="90" height="38" rx="19" fill="#B4875A"/>
+<rect x="72" y="80" width="11" height="28" rx="4" fill="#B4875A"/><rect x="122" y="80" width="11" height="28" rx="4" fill="#B4875A"/>
+<rect x="44" y="38" width="24" height="34" rx="11" fill="#B4875A"/><circle cx="40" cy="36" r="17" fill="#B4875A"/>
+<rect x="12" y="35" width="30" height="16" rx="8" fill="#B4875A"/>
+<path d="M134 62 Q153 52 149 31" fill="none" stroke="#B4875A" stroke-width="13" stroke-linecap="round"/>
+<path d="M43 26 Q58 24 58 42 Q58 60 50 62 Q42 60 43 42 Z" fill="#8E6338"/>
+</g><symbol id="dog" viewBox="0 0 160 120">
+<use href="#dogshapes" stroke="#46525F" stroke-width="5" stroke-linejoin="round"/><use href="#dogshapes"/>
+<circle cx="31" cy="31" r="3.2" fill="#fff" stroke="#46525F" stroke-width="1"/><circle cx="30.4" cy="31" r="2" fill="#111"/><circle cx="13" cy="39" r="3.4" fill="#111"/>
+<rect x="47" y="40" width="7" height="26" rx="3" fill="#2F6FD6" stroke="#46525F" stroke-width="1"/></symbol></defs></svg>
+<div class="hd"><div class="ttl">Explore <b>Inheritance</b></div>
+<div class="instr">Each parent passes on one copy of every gene.</div>
+<div class="gen">BREEDING F1 &middot; PUPPY 4 OF 8</div></div>
+<div class="wrap"><svg viewBox="0 0 1326 648">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+<path d="M0,1 L9,5 L0,9 z" fill="#6E7C8A"/></marker></defs>
+<use href="#dog" x="16" y="46" width="170" height="128"/>
+<text x="101" y="192" class="lbl">Mother</text>
+<text x="101" y="213" class="nml">Maple</text>
+<text x="228" y="30" class="lbl">Genotype</text>
+<rect x="192" y="38" width="72" height="144" class="grid"/>
+<line x1="228" y1="38" x2="228" y2="74" class="hair"/>
+<text x="210" y="62" class="al d">F</text>
+<text x="246" y="62" class="al r">f</text>
+<rect x="196" y="42" width="28" height="28" class="drawn"/>
+<line x1="192" y1="74" x2="264" y2="74" class="hair"/>
+<line x1="228" y1="74" x2="228" y2="110" class="hair"/>
+<text x="210" y="98" class="al d">S</text>
+<text x="246" y="98" class="al r">s</text>
+<rect x="232" y="78" width="28" height="28" class="drawn"/>
+<line x1="192" y1="110" x2="264" y2="110" class="hair"/>
+<line x1="228" y1="110" x2="228" y2="146" class="hair"/>
+<text x="210" y="134" class="al d">C</text>
+<text x="246" y="134" class="al r">c</text>
+<rect x="196" y="114" width="28" height="28" class="drawn"/>
+<line x1="192" y1="146" x2="264" y2="146" class="hair"/>
+<line x1="228" y1="146" x2="228" y2="182" class="hair"/>
+<text x="210" y="170" class="al d">B</text>
+<text x="246" y="170" class="al r">b</text>
+<rect x="232" y="150" width="28" height="28" class="drawn"/>
+<circle cx="430" cy="112" r="46" class="drum"/>
+<text x="430" y="117" class="drumlbl">Random</text>
+<path d="M264,110 C324,110 324,112 384,112" class="path"/>
+<rect x="208" y="200" width="184" height="46" class="rail"/>
+<text x="300" y="262" class="lbl">Other eggs</text>
+<text x="300" y="283" class="nml">kept, not lost</text>
+<path d="M430,158 C430,179 300,179 300,200" class="path"/>
+<rect x="218" y="209" width="28" height="28" class="tile rec"/>
+<text x="232" y="229" class="al r">f</text>
+<rect x="262" y="209" width="28" height="28" class="tile dom"/>
+<text x="276" y="229" class="al d">S</text>
+<rect x="306" y="209" width="28" height="28" class="tile rec"/>
+<text x="320" y="229" class="al r">c</text>
+<rect x="350" y="209" width="28" height="28" class="tile dom"/>
+<text x="364" y="229" class="al d">B</text>
+<path d="M430,158 C430,210 484,210 484,262" class="path"/>
+<rect x="409" y="262" width="150" height="52" class="gamete"/>
+<rect x="418" y="274" width="28" height="28" class="tile dom"/>
+<text x="432" y="294" class="al d">F</text>
+<rect x="452" y="274" width="28" height="28" class="tile rec"/>
+<text x="466" y="294" class="al r">s</text>
+<rect x="486" y="274" width="28" height="28" class="tile dom"/>
+<text x="500" y="294" class="al d">C</text>
+<rect x="520" y="274" width="28" height="28" class="tile rec"/>
+<text x="534" y="294" class="al r">b</text>
+<text x="484" y="332" class="gamlbl">EGG</text>
+<path d="M559,288 C590,288 590,288 621,288" class="path"/>
+<use href="#dog" x="1140" y="46" width="170" height="128"/>
+<text x="1225" y="192" class="lbl">Father</text>
+<text x="1225" y="213" class="nml">Rocket</text>
+<text x="1098" y="30" class="lbl">Genotype</text>
+<rect x="1062" y="38" width="72" height="144" class="grid"/>
+<line x1="1098" y1="38" x2="1098" y2="74" class="hair"/>
+<text x="1080" y="62" class="al d">F</text>
+<text x="1116" y="62" class="al r">f</text>
+<rect x="1102" y="42" width="28" height="28" class="drawn"/>
+<line x1="1062" y1="74" x2="1134" y2="74" class="hair"/>
+<line x1="1098" y1="74" x2="1098" y2="110" class="hair"/>
+<text x="1080" y="98" class="al d">S</text>
+<text x="1116" y="98" class="al r">s</text>
+<rect x="1066" y="78" width="28" height="28" class="drawn"/>
+<line x1="1062" y1="110" x2="1134" y2="110" class="hair"/>
+<line x1="1098" y1="110" x2="1098" y2="146" class="hair"/>
+<text x="1080" y="134" class="al d">C</text>
+<text x="1116" y="134" class="al r">c</text>
+<rect x="1102" y="114" width="28" height="28" class="drawn"/>
+<line x1="1062" y1="146" x2="1134" y2="146" class="hair"/>
+<line x1="1098" y1="146" x2="1098" y2="182" class="hair"/>
+<text x="1080" y="170" class="al d">B</text>
+<text x="1116" y="170" class="al r">b</text>
+<rect x="1066" y="150" width="28" height="28" class="drawn"/>
+<circle cx="896" cy="112" r="46" class="drum"/>
+<text x="896" y="117" class="drumlbl">Random</text>
+<path d="M1062,110 C1002,110 1002,112 942,112" class="path"/>
+<rect x="934" y="200" width="184" height="46" class="rail"/>
+<text x="1026" y="262" class="lbl">Other sperms</text>
+<text x="1026" y="283" class="nml">kept, not lost</text>
+<path d="M896,158 C896,179 1026,179 1026,200" class="path"/>
+<rect x="944" y="209" width="28" height="28" class="tile dom"/>
+<text x="958" y="229" class="al d">F</text>
+<rect x="988" y="209" width="28" height="28" class="tile rec"/>
+<text x="1002" y="229" class="al r">s</text>
+<rect x="1032" y="209" width="28" height="28" class="tile dom"/>
+<text x="1046" y="229" class="al d">C</text>
+<rect x="1076" y="209" width="28" height="28" class="tile rec"/>
+<text x="1090" y="229" class="al r">b</text>
+<path d="M896,158 C896,210 842,210 842,262" class="path"/>
+<rect x="767" y="262" width="150" height="52" class="gamete"/>
+<rect x="776" y="274" width="28" height="28" class="tile rec"/>
+<text x="790" y="294" class="al r">f</text>
+<rect x="810" y="274" width="28" height="28" class="tile dom"/>
+<text x="824" y="294" class="al d">S</text>
+<rect x="844" y="274" width="28" height="28" class="tile rec"/>
+<text x="858" y="294" class="al r">c</text>
+<rect x="878" y="274" width="28" height="28" class="tile dom"/>
+<text x="892" y="294" class="al d">B</text>
+<text x="842" y="332" class="gamlbl">SPERM</text>
+<path d="M767,288 C736,288 736,288 705,288" class="path"/>
+<circle cx="663" cy="288" r="42" class="meet"/>
+<text x="663" y="293" class="drumlbl">They meet</text>
+<text x="663" y="238" class="lbl">Fertilisation</text>
+<text x="10" y="360" class="lbl lstart">This litter</text>
+<text x="1316" y="360" class="lbl lend">3 of 8</text>
+<path d="M663,330 C663,351 579.5,351 579.5,372" class="path"/>
+<rect x="0" y="372" width="157" height="250" class="slot"/>
+<use href="#dog" x="4.5" y="400" width="148" height="111"/>
+<text x="78.5" y="536" class="nm">Biscuit ♀</text>
+<text x="27.5" y="568" class="pair">Ff</text>
+<text x="61.5" y="568" class="pair">Ss</text>
+<text x="95.5" y="568" class="pair">Cc</text>
+<text x="129.5" y="568" class="pair">Bb</text>
+<rect x="167" y="372" width="157" height="250" class="slot"/>
+<use href="#dog" x="171.5" y="400" width="148" height="111"/>
+<text x="245.5" y="536" class="nm">Pepper ♂</text>
+<text x="194.5" y="568" class="pair">Ff</text>
+<text x="228.5" y="568" class="pair">Ss</text>
+<text x="262.5" y="568" class="pair">Cc</text>
+<text x="296.5" y="568" class="pair">Bb</text>
+<rect x="334" y="372" width="157" height="250" class="slot"/>
+<use href="#dog" x="338.5" y="400" width="148" height="111"/>
+<text x="412.5" y="536" class="nm">Mochi ♀</text>
+<text x="361.5" y="568" class="pair">Ff</text>
+<text x="395.5" y="568" class="pair">Ss</text>
+<text x="429.5" y="568" class="pair">Cc</text>
+<text x="463.5" y="568" class="pair">Bb</text>
+<rect x="501" y="372" width="157" height="250" class="slot empty"/>
+<text x="579.5" y="497" class="slotn">4</text>
+<rect x="668" y="372" width="157" height="250" class="slot empty"/>
+<text x="746.5" y="497" class="slotn">5</text>
+<rect x="835" y="372" width="157" height="250" class="slot empty"/>
+<text x="913.5" y="497" class="slotn">6</text>
+<rect x="1002" y="372" width="157" height="250" class="slot empty"/>
+<text x="1080.5" y="497" class="slotn">7</text>
+<rect x="1169" y="372" width="157" height="250" class="slot empty"/>
+<text x="1247.5" y="497" class="slotn">8</text>
+</svg></div>
+<div class="foot"><details class="key"><summary>Key</summary><div class="kp">
+  <div><span class="kh">Symbols</span>
+    <p><b class="sym">&#9792;</b> female</p><p><b class="sym">&#9794;</b> male</p></div>
+  <div><span class="kh">Letters</span>
+    <p><b class="al d">F</b> capital &mdash; dominant, one copy shows</p>
+    <p><b class="al r">f</b> lowercase &mdash; recessive, needs both</p></div>
+  <div><span class="kh">This litter&rsquo;s genes</span>
+    <p><b class="al d">F</b><b class="al r">f</b> beard &nbsp; <b class="al d">S</b><b class="al r">s</b> short coat &nbsp; <b class="al d">B</b><b class="al r">b</b> black</p>
+    <p><b class="al d">C</b><b class="al r">c</b> curl &mdash; <b class="al">CC</b> curly, <b class="al">Cc</b> wavy, <b class="al">cc</b> straight</p></div>
+</div></details><span class="flbl">Watch which copy goes where</span><div class="sp"></div>
+ <div class="btn2">Skip</div><div class="btn">Keep this puppy</div></div>
+</body></html>

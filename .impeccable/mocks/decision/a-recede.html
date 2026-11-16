@@ -1,0 +1,95 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Generations Recede</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1366px;height:768px;overflow:hidden}
+body{background:#070B10;color:#EAF1F7;font:400 15px/1.35 Jost,system-ui,sans-serif;display:flex;flex-direction:column}
+.hd{height:54px;display:flex;align-items:center;gap:22px;padding:0 24px;border-bottom:1px solid #28384A;flex:0 0 auto}
+.ttl{font-size:19px}.ttl b{color:#F5C518;font-weight:500}
+.instr{font-size:17px}
+.gen{margin-left:auto;font:600 12px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;color:#93A6B8}
+.lbl{font:600 12px/1.35 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#93A6B8;text-transform:uppercase}
+.ct{display:flex;border:1px solid #28384A}
+.ct>div{flex:1;padding:9px 12px;border-right:1px solid #28384A}
+.ct>div:last-child{border-right:0}
+.n{font:600 21px/1.15 'IBM Plex Mono',monospace;color:#3FD17A}
+.btn{height:48px;padding:0 26px;background:#F5C518;color:#070B10;font:500 15px/48px Jost,sans-serif;text-align:center}
+.btn2{height:48px;padding:0 22px;border:1px solid #3E5A75;font:400 15px/46px Jost,sans-serif;text-align:center}
+/* receding past */
+.stack{flex:0 0 128px;padding:9px 24px 0;display:flex;flex-direction:column;gap:7px;justify-content:flex-end}
+.past{display:flex;align-items:center;gap:14px;padding:4px 12px;border:1px solid #28384A;background:#0D141C}
+.p0{opacity:.32;transform:scale(.94)}.p1{opacity:.6;transform:scale(.975)}
+.past .who{flex:0 0 34px}
+.mini{display:flex;gap:6px;flex:1}
+.past .ct{flex:0 0 352px;border:0}
+.past .ct>div{padding:6px 11px}.past .n{font-size:13px}
+/* current pair */
+.pair{flex:0 0 212px;display:flex;align-items:center;justify-content:center;gap:30px;padding:10px 24px}
+.par{width:252px;display:flex;flex-direction:column;align-items:center;gap:5px}
+.lane{width:224px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.drum{width:96px;height:96px;border:2px solid #3E5A75;border-radius:50%;background:#141E29;display:flex;align-items:center;justify-content:center}
+.tile{width:25px;height:29px;border:1px solid #3E5A75;background:#0D141C;font:600 13px/27px 'IBM Plex Mono',monospace;text-align:center;color:#93A6B8}
+.d{border-color:#2272BC;color:#9FD3FA}.r{border-color:#B6303B;color:#FFA392}
+.row{display:flex;gap:5px}.rail{display:flex;gap:4px;opacity:.45}
+/* litter */
+.slots{flex:0 0 158px;padding:0 24px;display:flex;gap:9px}
+.slot{flex:1;border:1px solid #28384A;background:#0D141C;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.slot.sel{border-color:#F5C518;background:#141E29}
+.slot.e{border-style:dashed;opacity:.35}
+.foot{flex:1;display:flex;align-items:center;gap:16px;padding:0 24px}
+.foot .ct{flex:0 1 600px}
+.sp{flex:1}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute"><symbol id="dog" viewBox="0 0 160 120">
+<ellipse cx="90" cy="111" rx="54" ry="4" fill="#000" opacity=".2"/>
+<rect x="60" y="78" width="10" height="28" rx="4" fill="#8E6338"/><rect x="110" y="78" width="10" height="28" rx="4" fill="#8E6338"/>
+<rect x="48" y="50" width="90" height="38" rx="19" fill="#B4875A"/>
+<rect x="72" y="80" width="11" height="28" rx="4" fill="#B4875A"/><rect x="122" y="80" width="11" height="28" rx="4" fill="#B4875A"/>
+<rect x="44" y="38" width="24" height="34" rx="11" fill="#B4875A"/><circle cx="40" cy="36" r="17" fill="#B4875A"/>
+<rect x="12" y="35" width="30" height="16" rx="8" fill="#B4875A"/>
+<path d="M134 62 Q153 52 149 31" fill="none" stroke="#B4875A" stroke-width="13" stroke-linecap="round"/>
+<path d="M43 26 Q58 24 58 42 Q58 60 50 62 Q42 60 43 42 Z" fill="#8E6338"/>
+<circle cx="31" cy="31" r="3.2" fill="#fff"/><circle cx="30.4" cy="31" r="2" fill="#111"/><circle cx="13" cy="39" r="3.4" fill="#111"/>
+<rect x="47" y="40" width="7" height="26" rx="3" fill="#2F6FD6"/></symbol></svg>
+
+<div class="hd"><div class="ttl">Explore <b>Inheritance</b></div>
+<div class="instr">Choose one puppy to keep.</div>
+<div class="gen">F2 · LITTER OF 8</div></div>
+
+<div class="stack">
+ <div class="past p0"><div class="who lbl">P</div>
+  <div class="mini"><svg width="52" height="39"><use href="#dog"/></svg><svg width="52" height="39"><use href="#dog"/></svg></div>
+  <div class="ct"><div><div class="lbl">Beard</div><div class="n">1</div></div><div><div class="lbl">None</div><div class="n">1</div></div><div><div class="lbl">Short</div><div class="n">1</div></div><div><div class="lbl">Long</div><div class="n">1</div></div></div></div>
+ <div class="past p1"><div class="who lbl">F1</div>
+  <div class="mini"><svg width="52" height="39"><use href="#dog"/></svg><svg width="52" height="39"><use href="#dog"/></svg><svg width="52" height="39"><use href="#dog"/></svg><svg width="52" height="39"><use href="#dog"/></svg><svg width="52" height="39"><use href="#dog"/></svg><svg width="52" height="39"><use href="#dog"/></svg><svg width="52" height="39"><use href="#dog"/></svg><svg width="52" height="39"><use href="#dog"/></svg></div>
+  <div class="ct"><div><div class="lbl">Beard</div><div class="n">8</div></div><div><div class="lbl">None</div><div class="n">0</div></div><div><div class="lbl">Short</div><div class="n">8</div></div><div><div class="lbl">Long</div><div class="n">0</div></div></div></div>
+</div>
+
+<div class="pair">
+ <div class="par"><svg width="186" height="140"><use href="#dog"/></svg>
+  <div class="lbl">Maple · ♀ · F1</div>
+  <div class="rail"><span class="tile d">F</span><span class="tile r">s</span></div></div>
+ <div class="lane"><div class="drum"><div class="lbl">Random</div></div>
+  <div class="row"><span class="tile d">F</span><span class="tile r">f</span></div>
+  <div class="lbl">Other eggs / sperm</div></div>
+ <div class="par"><svg width="186" height="140"><use href="#dog"/></svg>
+  <div class="lbl">Rocket · ♂ · F1</div>
+  <div class="rail"><span class="tile r">f</span><span class="tile d">S</span></div></div>
+</div>
+
+<div class="slots">
+ <div class="slot"><svg width="88" height="66"><use href="#dog"/></svg><div class="lbl">Biscuit ♀</div></div>
+ <div class="slot sel"><svg width="88" height="66"><use href="#dog"/></svg><div class="lbl">Pepper ♂</div></div>
+ <div class="slot"><svg width="88" height="66"><use href="#dog"/></svg><div class="lbl">Mochi ♀</div></div>
+ <div class="slot"><svg width="88" height="66"><use href="#dog"/></svg><div class="lbl">Scout ♂</div></div>
+ <div class="slot"><svg width="88" height="66"><use href="#dog"/></svg><div class="lbl">Olive ♀</div></div>
+ <div class="slot"><svg width="88" height="66"><use href="#dog"/></svg><div class="lbl">Waffles ♂</div></div>
+ <div class="slot"><svg width="88" height="66"><use href="#dog"/></svg><div class="lbl">Clover ♀</div></div>
+ <div class="slot e"><div class="lbl">8</div></div>
+</div>
+
+<div class="foot">
+ <div class="ct"><div><div class="lbl">Beard</div><div class="n">6</div></div><div><div class="lbl">No beard</div><div class="n">2</div></div><div><div class="lbl">Short coat</div><div class="n">5</div></div><div><div class="lbl">Long coat</div><div class="n">3</div></div></div>
+ <div class="sp"></div>
+ <div class="btn2">Breed again</div><div class="btn">Keep this puppy</div>
+</div>
+</body></html>

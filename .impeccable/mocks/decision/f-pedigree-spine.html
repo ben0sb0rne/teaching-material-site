@@ -1,0 +1,141 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Pedigree Spine</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1366px;height:768px;overflow:hidden}
+body{background:#EDE8DC;color:#0E141A;font:400 15px/1.35 Jost,system-ui,sans-serif;display:flex;flex-direction:column}
+.hd{height:54px;display:flex;align-items:center;gap:22px;padding:0 24px;border-bottom:1px solid #6E7C8A;flex:0 0 auto}
+.ttl{font-size:19px}.ttl b{color:#7A5A00;font-weight:500}
+.instr{font-size:17px}
+.gen{margin-left:auto;font:600 12px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;color:#46525F}
+.wrap{flex:1;position:relative;padding:0 20px;min-height:0}
+svg.tree{display:block;width:1326px;height:600px}
+.ln{stroke:#6E7C8A;stroke-width:1}
+.ln.gh{stroke-dasharray:3 4}
+.kept{fill:#FFFDF6;stroke:#7A5A00;stroke-width:1.5}
+.ghost{fill:none;stroke:#6E7C8A;stroke-width:1;stroke-dasharray:3 4}
+/* genotypes and codes never pass through text-transform: F and f differ */
+text{text-anchor:middle}
+.nm{font:400 12px Jost,sans-serif;fill:#46525F;text-transform:none}
+.code{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.14em;fill:#7A5A00;text-transform:none}
+.gl{font:600 14px 'IBM Plex Mono',monospace;fill:#7A5A00;text-anchor:start}
+.ct{position:absolute;left:1046px;width:300px;display:flex;border:1px solid #6E7C8A;background:#F7F3E9}
+.ct>div{flex:1;padding:5px 8px;border-right:1px solid #BFC7CF}
+.ct>div:last-child{border-right:0}
+.ct.ghost{border-style:dashed;background:none}
+.lbl{font:600 11px/1.3 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#46525F;text-transform:uppercase}
+.n{font:600 16px/1.1 'IBM Plex Mono',monospace;color:#0F6340}
+.ct.ghost .n{color:#46525F}
+.foot{flex:0 0 62px;display:flex;align-items:center;gap:12px;padding:0 24px;border-top:1px solid #6E7C8A}
+.flbl{font:600 12px 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#46525F;text-transform:uppercase}
+.sp{flex:1}
+.btn{height:48px;padding:0 26px;background:#F5C518;color:#0E141A;font:500 15px/48px Jost,sans-serif}
+.btn2{height:48px;padding:0 22px;border:1px solid #6E7C8A;font:400 15px/46px Jost,sans-serif}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute"><g id="dogshapes">
+<rect x="60" y="78" width="10" height="28" rx="4" fill="#8E6338"/><rect x="110" y="78" width="10" height="28" rx="4" fill="#8E6338"/>
+<rect x="48" y="50" width="90" height="38" rx="19" fill="#B4875A"/>
+<rect x="72" y="80" width="11" height="28" rx="4" fill="#B4875A"/><rect x="122" y="80" width="11" height="28" rx="4" fill="#B4875A"/>
+<rect x="44" y="38" width="24" height="34" rx="11" fill="#B4875A"/><circle cx="40" cy="36" r="17" fill="#B4875A"/>
+<rect x="12" y="35" width="30" height="16" rx="8" fill="#B4875A"/>
+<path d="M134 62 Q153 52 149 31" fill="none" stroke="#B4875A" stroke-width="13" stroke-linecap="round"/>
+<path d="M43 26 Q58 24 58 42 Q58 60 50 62 Q42 60 43 42 Z" fill="#8E6338"/>
+</g><symbol id="dog" viewBox="0 0 160 120">
+<use href="#dogshapes" stroke="#46525F" stroke-width="5" stroke-linejoin="round"/><use href="#dogshapes"/>
+<circle cx="31" cy="31" r="3.2" fill="#fff" stroke="#46525F" stroke-width="1"/><circle cx="30.4" cy="31" r="2" fill="#111"/><circle cx="13" cy="39" r="3.4" fill="#111"/>
+<rect x="47" y="40" width="7" height="26" rx="3" fill="#2F6FD6" stroke="#46525F" stroke-width="1"/></symbol></svg>
+
+<div class="hd"><div class="ttl">Explore <b>Inheritance</b></div>
+<div class="instr">Choose one puppy to keep.</div>
+<div class="gen">F2 &middot; LITTER OF 8</div></div>
+
+<div class="wrap"><svg class="tree" viewBox="0 0 1326 600">
+<line x1="101" y1="60" x2="136" y2="60" class="ln"/>
+<use href="#dog" x="23" y="30.5" width="78" height="59"/><use href="#dog" x="136" y="30.5" width="78" height="59"/>
+<text x="62" y="104.5" class="nm">Juno ♀</text><text x="175" y="104.5" class="nm">Bruno ♂</text>
+<line x1="118.5" y1="60" x2="118.5" y2="171" class="ln"/>
+<line x1="118.5" y1="171" x2="931" y2="171" class="ln"/>
+<line x1="175" y1="171" x2="175" y2="185" class="ln"/>
+<rect x="129" y="178.5" width="92" height="89" class="kept"/>
+<use href="#dog" x="136" y="185.5" width="78" height="59"/>
+<text x="175" y="259.5" class="code">YKJH7</text>
+<line x1="283" y1="171" x2="283" y2="185" class="ln"/>
+<use href="#dog" x="244" y="185.5" width="78" height="59"/>
+<text x="283" y="259.5" class="nm">Rye</text>
+<line x1="391" y1="171" x2="391" y2="185" class="ln"/>
+<use href="#dog" x="352" y="185.5" width="78" height="59"/>
+<text x="391" y="259.5" class="nm">Fig</text>
+<line x1="499" y1="171" x2="499" y2="185" class="ln"/>
+<use href="#dog" x="460" y="185.5" width="78" height="59"/>
+<text x="499" y="259.5" class="nm">Sage</text>
+<line x1="607" y1="171" x2="607" y2="185" class="ln"/>
+<use href="#dog" x="568" y="185.5" width="78" height="59"/>
+<text x="607" y="259.5" class="nm">Juniper</text>
+<line x1="715" y1="171" x2="715" y2="185" class="ln"/>
+<use href="#dog" x="676" y="185.5" width="78" height="59"/>
+<text x="715" y="259.5" class="nm">Birch</text>
+<line x1="823" y1="171" x2="823" y2="185" class="ln"/>
+<use href="#dog" x="784" y="185.5" width="78" height="59"/>
+<text x="823" y="259.5" class="nm">Cedar</text>
+<line x1="931" y1="171" x2="931" y2="185" class="ln"/>
+<use href="#dog" x="892" y="185.5" width="78" height="59"/>
+<text x="931" y="259.5" class="nm">Ash</text>
+<line x1="101" y1="215" x2="136" y2="215" class="ln"/>
+<use href="#dog" x="23" y="185.5" width="78" height="59"/><text x="62" y="259.5" class="code">HP9PA</text>
+<line x1="118.5" y1="215" x2="118.5" y2="326" class="ln"/>
+<line x1="118.5" y1="326" x2="931" y2="326" class="ln"/>
+<line x1="175" y1="326" x2="175" y2="340" class="ln"/>
+<use href="#dog" x="136" y="340.5" width="78" height="59"/>
+<text x="175" y="414.5" class="nm">Biscuit</text>
+<line x1="283" y1="326" x2="283" y2="340" class="ln"/>
+<rect x="237" y="333.5" width="92" height="89" class="kept"/>
+<use href="#dog" x="244" y="340.5" width="78" height="59"/>
+<text x="283" y="414.5" class="nm">Pepper</text>
+<line x1="391" y1="326" x2="391" y2="340" class="ln"/>
+<use href="#dog" x="352" y="340.5" width="78" height="59"/>
+<text x="391" y="414.5" class="nm">Mochi</text>
+<line x1="499" y1="326" x2="499" y2="340" class="ln"/>
+<use href="#dog" x="460" y="340.5" width="78" height="59"/>
+<text x="499" y="414.5" class="nm">Scout</text>
+<line x1="607" y1="326" x2="607" y2="340" class="ln"/>
+<use href="#dog" x="568" y="340.5" width="78" height="59"/>
+<text x="607" y="414.5" class="nm">Olive</text>
+<line x1="715" y1="326" x2="715" y2="340" class="ln"/>
+<use href="#dog" x="676" y="340.5" width="78" height="59"/>
+<text x="715" y="414.5" class="nm">Waffles</text>
+<line x1="823" y1="326" x2="823" y2="340" class="ln"/>
+<use href="#dog" x="784" y="340.5" width="78" height="59"/>
+<text x="823" y="414.5" class="nm">Clover</text>
+<line x1="931" y1="326" x2="931" y2="340" class="ln"/>
+<use href="#dog" x="892" y="340.5" width="78" height="59"/>
+<text x="931" y="414.5" class="nm">Tilly</text>
+<line x1="118.5" y1="481" x2="931" y2="481" class="ln gh"/>
+<line x1="175" y1="481" x2="175" y2="495" class="ln gh"/>
+<rect x="136" y="495.5" width="78" height="59" class="ghost"/>
+<line x1="283" y1="481" x2="283" y2="495" class="ln gh"/>
+<rect x="244" y="495.5" width="78" height="59" class="ghost"/>
+<line x1="391" y1="481" x2="391" y2="495" class="ln gh"/>
+<rect x="352" y="495.5" width="78" height="59" class="ghost"/>
+<line x1="499" y1="481" x2="499" y2="495" class="ln gh"/>
+<rect x="460" y="495.5" width="78" height="59" class="ghost"/>
+<line x1="607" y1="481" x2="607" y2="495" class="ln gh"/>
+<rect x="568" y="495.5" width="78" height="59" class="ghost"/>
+<line x1="715" y1="481" x2="715" y2="495" class="ln gh"/>
+<rect x="676" y="495.5" width="78" height="59" class="ghost"/>
+<line x1="823" y1="481" x2="823" y2="495" class="ln gh"/>
+<rect x="784" y="495.5" width="78" height="59" class="ghost"/>
+<line x1="931" y1="481" x2="931" y2="495" class="ln gh"/>
+<rect x="892" y="495.5" width="78" height="59" class="ghost"/>
+<text x="8" y="65" class="gl">P</text>
+<text x="8" y="220" class="gl">F1</text>
+<text x="8" y="375" class="gl">F2</text>
+<text x="8" y="530" class="gl">F3</text>
+</svg>
+<div class="ct" style="top:28px"><div><div class="lbl">Beard</div><div class="n">1</div></div><div><div class="lbl">No beard</div><div class="n">1</div></div><div><div class="lbl">Short</div><div class="n">1</div></div><div><div class="lbl">Long</div><div class="n">1</div></div></div>
+<div class="ct" style="top:183px"><div><div class="lbl">Beard</div><div class="n">8</div></div><div><div class="lbl">No beard</div><div class="n">0</div></div><div><div class="lbl">Short</div><div class="n">8</div></div><div><div class="lbl">Long</div><div class="n">0</div></div></div>
+<div class="ct" style="top:338px"><div><div class="lbl">Beard</div><div class="n">6</div></div><div><div class="lbl">No beard</div><div class="n">2</div></div><div><div class="lbl">Short</div><div class="n">5</div></div><div><div class="lbl">Long</div><div class="n">3</div></div></div>
+<div class="ct ghost" style="top:493px"><div><div class="lbl">Beard</div><div class="n">—</div></div><div><div class="lbl">No beard</div><div class="n">—</div></div><div><div class="lbl">Short</div><div class="n">—</div></div><div><div class="lbl">Long</div><div class="n">—</div></div></div>
+</div>
+
+<div class="foot"><span class="flbl">Copy each row to your sheet</span><div class="sp"></div>
+ <div class="btn2">Breed again</div><div class="btn">Keep this puppy</div></div>
+</body></html>

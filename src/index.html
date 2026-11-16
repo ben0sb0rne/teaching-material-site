@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Science Activities</title>
+<meta name="description" content="Interactive science activities for my classes.">
+<link rel="stylesheet" href="kit/kit.css">
+  <script defer src="kit/debug.js"></script>
+<style>
+  .lede { margin: 10px 0 26px; max-width: 58ch; font-size: 17px; font-weight: 500; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 26px; }
+  .tile { display: block; color: inherit; text-decoration: none;
+          transition: transform 140ms var(--ease-out), box-shadow 140ms var(--ease-out); }
+  .tile h2 { font-size: 23px; text-transform: uppercase; margin-bottom: 8px; }
+  .tile p { margin: 0; color: var(--ink-soft); font-size: 15px; }
+  .tile .unit-row { display: flex; gap: 5px; margin-bottom: 12px; }
+  .tile .unit-row i { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--ink); }
+  .tile .unit-row i.on {
+    border-color: rgba(0,0,0,.45);
+    background: radial-gradient(circle at 34% 30%, var(--solute-lit), var(--solute) 46%, var(--solute-dim));
+  }
+  .tile:active { transform: translate(3px, 3px); }
+  .tile:active .panel { box-shadow: 0 0 0 var(--ink); }
+  @media (hover: hover) and (pointer: fine) {
+    .tile:hover .panel__head { background: var(--solute); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Same orbital petals as the activities, so the index belongs to the
+     same world rather than being a plain list in front of it. -->
+<div class="fields" aria-hidden="true">
+  <svg viewBox="0 0 120 90" preserveAspectRatio="xMidYMid slice">
+    <g transform="translate(62 44)">
+      <ellipse rx="58" ry="17" fill="var(--field-a)" transform="rotate(0)"/>
+      <ellipse rx="58" ry="17" fill="var(--field-b)" transform="rotate(60)"/>
+      <ellipse rx="58" ry="17" fill="var(--field-c)" transform="rotate(120)"/>
+    </g>
+  </svg>
+</div>
+
+<main class="shell">
+  <header class="topbar">
+    <h1 class="topbar__title">Science <em>Activities</em></h1>
+    <span class="chip">Chemical Interactions</span>
+  </header>
+
+  <p class="lede">Simulations to run alongside the investigations. Everything here works on a Chromebook, with a trackpad, a touchscreen, or just the keyboard.</p>
+
+  <div class="grid">
+    <a class="tile" href="activities/explore-dissolving/">
+      <div class="panel">
+        <div class="panel__head"><span>Inv.&nbsp;7 &middot; Part&nbsp;2</span><b>Plate 7.2</b></div>
+        <div class="panel__body">
+          <div class="unit-row" aria-hidden="true">
+            <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+          </div>
+          <h2>Explore Dissolving</h2>
+          <p>Observe sugar and calcium carbonate meet water, one particle collision at a time.</p>
+        </div>
+      </div>
+    </a>
+  </div>
+</main>
+
+</body>
+</html>

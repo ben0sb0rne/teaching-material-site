@@ -1,0 +1,255 @@
+ALL TEXT — Science Activities
+Everything a student can read on screen, in the order they meet it.
+Generated 27 Oct 2026 from src/. Edit here, then I'll apply it to the source.
+
+Lines marked [+] are assembled at runtime from parts; the number shown is the
+value today, and {n} marks where a live number drops in.
+Lines marked [SR] are for screen readers only — never seen, always heard.
+Lines marked [ART] are engraved or printed into a layer image, not set in
+HTML. Changing one means re-rendering that layer, not editing a file.
+
+
+================================================================================
+LANDING PAGE                                         src/index.html
+================================================================================
+
+Browser tab        Science Activities
+Page description   Interactive science activities for my classes.
+
+Title              Science Activities
+Section heading    Chemical Interactions
+Intro              Simulations to run alongside the investigations. Everything
+                   here works on a Chromebook, with a trackpad, a touchscreen,
+                   or just the keyboard.
+
+Activity card
+  Label            Inv. 7 · Part 2
+  Plate number     Plate 7.2
+  Name             Explore Dissolving
+  Blurb            Observe sugar and calcium carbonate meet water, one particle
+                   collision at a time.
+
+
+================================================================================
+EXPLORE DISSOLVING                 src/activities/explore-dissolving/index.html
+================================================================================
+
+Browser tab        Explore Dissolving
+Page description   A particle model of what happens when a solid is stirred
+                   into water.
+
+The screen is one instrument on a bench. Both samples run at once, under the
+same water, the same clock and the same collisions. There is no walkthrough
+and nothing to click through: the student dispenses water and watches.
+
+
+--------------------------------------------------------------------------------
+IDENTIFY READOUT                                       console, top left
+--------------------------------------------------------------------------------
+
+Two lines: a name in capitals, and one sentence under it. Hovering an object
+names it, focusing a control names it, and on a touchscreen a tap names it.
+A tap on a key both names it and presses it.
+
+Default, nothing selected
+  Name             NO SELECTION
+  Description      Select an object to identify it.
+
+Every object that answers, with the description it gives:
+
+  Water particle              Water, the solvent. Constantly moving and
+                              colliding.
+  Sugar particle (in pile)    Sugar, the solute. Held in the pile by attraction
+                              to other sugar particles.
+  Sugar particle (free)       Dissolved sugar. Part of the solution.
+  Calcium carbonate particle  Calcium carbonate, the main ingredient in chalk.
+                              Insoluble in water.
+  Scale bar                   1 nanometre, one billionth of a metre.
+  Viewport                    Magnified tens of millions of times.
+  Register                    Particles dissolved. One light per particle.
+  Counter                     Particles dissolved, out of 50.
+  Clock                       Seconds since water was added.
+  Freeze                      Pauses the simulation.
+  Stir                        Spins the stir bars in both beakers.
+  Reset                       Drains both beakers and adds fresh samples.
+  Dispense water              Adds 250 mL of water to both beakers at once.
+  Sugar                       Sugar, C₁₂H₂₂O₁₁.
+  Calcium carbonate           Calcium carbonate, CaCO₃.
+  Beaker                      250 mL beaker.
+  Stir bar                    Magnetic stir bar. Spins when the stir plate is
+                              on.
+  Stir plate                  Magnetic stir plate. Spins the stir bar from
+                              below.
+  Probe                       Sends the magnified view to the viewport.
+  Nozzle                      Water outlet.
+  Powder chute                Adds a measured sample of powder.
+  Water temperature           Hotter water is faster particles, so they hit
+                              the solid harder and more often.
+  Sample head                 Carries the water nozzle, the powder chute and
+                              the probe.
+
+  The names above are shown in capitals. "Probe" is written but not yet
+  reachable: the head is one piece of art, so it answers for the whole
+  assembly. Nozzle and powder chute answer from the streams that come out of
+  them.
+
+
+--------------------------------------------------------------------------------
+CLOCK AND COUNTERS                                     console
+--------------------------------------------------------------------------------
+
+Clock
+  Value            00.0                            [+] seconds since water
+  Label            SECONDS
+
+  The clock starts when the beakers finish filling, not when the key is
+  pressed, so every run begins from the same moment.
+
+Counter, once per sample
+  Value            00                              [+] particles dissolved
+  Of               / 50
+
+Register panel     DISSOLVED                                               [ART]
+
+  Fifty lights, one per particle, five across and ten down.
+
+
+--------------------------------------------------------------------------------
+KEYS                                                   console
+--------------------------------------------------------------------------------
+
+Printed on the keycaps                                                     [ART]
+  FREEZE
+  STIR
+  RESET
+  WATER
+
+Water temperature slider                                 console, beside WATER
+  Panel            WATER TEMP
+  Value            20 °C         [+] the temperature now set, 20 to 100
+  Ticks            20     60     100
+
+  Continuous from 20 °C to 100 °C. The ticks mark the three the lesson
+  compares; H jumps between them. 20 °C is the plate off, 100 °C is the boil.
+
+Keyboard shortcuts. These work, but nothing on the cap says so: a real
+instrument does not have letters printed under its buttons, and the caps read
+as hardware only while they stay clean.
+  Freeze           SPACE
+  Stir             S
+  Reset            R
+  Dispense water   W
+  Water temp       H          jumps to the next marked temperature, and wraps
+
+  The slider also takes the arrow keys (1 degree), Page Up and Page Down
+  (10 degrees) and Home and End once it has focus, and it can be dragged.
+
+[SR] button labels Freeze
+                   Stir
+                   Reset
+                   Dispense water
+
+
+--------------------------------------------------------------------------------
+NAMEPLATES AND GLASSWARE                               stations
+--------------------------------------------------------------------------------
+
+Engraved nameplates                                                        [ART]
+  Left             SUGAR                     C₁₂H₂₂O₁₁
+  Right            CALCIUM CARBONATE         CaCO₃
+
+  The substance names are among the most prominent things on the screen, and
+  each plate carries a colour dot matching that sample's particles. Colour is
+  never the only difference: the plates and the positions say it too.
+
+Beaker graduations                                                         [ART]
+  Unit             mL
+  Marks            250  200  150  100  50
+
+Scale bar, in each viewport
+  Label            1 nm
+
+
+--------------------------------------------------------------------------------
+LAB NOTEBOOK                                           right of the bench
+--------------------------------------------------------------------------------
+
+Headings           Objectives
+                   Challenges
+                   Observations
+
+The items below are PLACEHOLDERS. They exist so the notebook can be tested and
+are meant to be replaced; the real objectives and challenges are still to be
+written. Each one names an event, and writes its line into Observations when
+that event happens.
+
+Objectives
+  1  Placeholder objective: add water to both beakers.
+     writes → Added 250 mL of water to both samples.
+  2  Placeholder objective: watch one sugar particle break free.
+     writes → A sugar particle broke away from the pile.
+  3  Placeholder objective: stir both beakers.
+     writes → Stirred both beakers.
+
+Challenges
+  1  Placeholder prediction: will the calcium carbonate dissolve?
+     choices  Yes   No
+     writes → Recorded a prediction about calcium carbonate.
+  2  Placeholder challenge: dissolve every sugar particle.
+     writes → Every sugar particle dissolved.
+  3  Placeholder challenge: identify a buried sugar particle.
+     writes → Identified a particle buried inside the pile.
+
+  A prediction has to be answered before it can be judged: the choice is
+  recorded when it is tapped, and the item completes later, when what it
+  predicted actually happens.
+
+
+--------------------------------------------------------------------------------
+WHEN THE SCREEN IS THE WRONG SHAPE                     portrait, or no server
+--------------------------------------------------------------------------------
+
+Portrait
+  Heading          Turn your device sideways
+  Line             This instrument needs a landscape screen.
+
+If the layout cannot load
+  Message          This activity could not load its layout ({reason}). It needs
+                   to be served over http — try the dev server rather than
+                   opening the file directly.                                [+]
+
+
+================================================================================
+SPOKEN ALOUD                                      screen readers only, never seen
+================================================================================
+
+Each viewport carries a label
+  Left             Magnified view of sugar in water
+  Right            Magnified view of calcium carbonate in water
+
+Progress, read at most every 4 seconds while the simulation runs:
+
+  {8} of 50 sugar particles and {0} of 50 calcium carbonate particles have
+  dissolved after {12} seconds.
+
+Said once, when the instrument changes state:
+
+  Water at 20 degrees. / Water at 60 degrees. / Water at 100 degrees.
+  The water boiled away. The solid is left behind.
+  Water added.
+  Simulation frozen.
+  Simulation resumed.
+  Reset complete.
+  Stirred the dry powder. Nothing dissolves until water is added.
+
+  The last one is said when Stir is pressed before any water has been
+  dispensed. The powder visibly shifts as well; with reduced motion it is
+  left leaning to one side instead of rocking, so the stir still shows.
+
+Said once, when a notebook item completes:
+
+  Observed: {Every sugar particle dissolved.}
+
+Said once, when a prediction is answered:
+
+  Prediction recorded: {Yes}.

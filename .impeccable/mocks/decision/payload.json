@@ -1,0 +1,49 @@
+{
+  "title": "Explore Inheritance — breeding screen layout",
+  "question": "Three structures for the same screen, same palette throughout so the choice is composition only. Lock one, steer, or re-roll.",
+  "buildPath": { "value": "code", "toggle": false },
+  "steer": true,
+  "reroll": true,
+  "options": [
+    {
+      "id": "recede",
+      "kind": "assigned",
+      "kicker": "THE ROLL",
+      "label": "Generations Recede",
+      "lineage": "time rendered as depth",
+      "thesis": "Past generations shrink and dim upward while the live litter holds the floor.",
+      "palette": ["#070B10", "#0D141C", "#F5C518", "#3FD17A"],
+      "materials": ["scaled strips", "centred stage", "camera move"],
+      "viewport": "Two faded generation strips above, breeding pair and tumbler centred, eight litter slots, counts and controls on the floor.",
+      "risk": "The recede barely read at 1366x768: P and F1 look nearly equal, so the depth idea may not survive the build.",
+      "html": ".impeccable/mocks/decision/a-recede.html",
+      "htmlFrame": "1366x768"
+    },
+    {
+      "id": "ledger",
+      "kind": "dealt",
+      "label": "Ledger Spine",
+      "lineage": "the record sheet itself",
+      "thesis": "The pedigree is a ledger whose rows carry their own tallies, so the screen already looks like the sheet they copy onto.",
+      "palette": ["#070B10", "#0A1016", "#F5C518", "#3FD17A"],
+      "materials": ["ruled rows", "inline tallies", "dog code in the row"],
+      "viewport": "A 452px ledger down the left, one row per generation with pair thumbs, kept dog's code and its counts inline; breeding stage fills the right.",
+      "risk": "The ledger is dead weight on Day 1 when only one row exists, and it costs a third of the width forever.",
+      "html": ".impeccable/mocks/decision/b-ledger.html",
+      "htmlFrame": "1366x768"
+    },
+    {
+      "id": "board",
+      "kind": "dealt",
+      "label": "Specimen Board",
+      "lineage": "a pinned specimen board",
+      "thesis": "Four permanent columns, one per generation; the board never clears, so the whole experiment is visible at once.",
+      "palette": ["#070B10", "#101A24", "#F5C518", "#3FD17A"],
+      "materials": ["gridded columns", "fixed count tables", "nothing hidden"],
+      "viewport": "P, F1, F2, F3 as full-height columns of dog tiles, each with its own counts table locked to the bottom.",
+      "risk": "No stage for the fertilisation sequence: the tumbler has nowhere to live, and that animation is the emotional centre of the lesson.",
+      "html": ".impeccable/mocks/decision/c-board.html",
+      "htmlFrame": "1366x768"
+    }
+  ]
+}

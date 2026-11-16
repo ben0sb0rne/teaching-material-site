@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Explore Dissolving</title>
+<meta name="description" content="A particle model of what happens when a solid is stirred into water.">
+<link rel="stylesheet" href="../../kit/kit.css">
+<link rel="stylesheet" href="dissolving.css">
+</head>
+<body>
+
+<!-- The wall and bench run past the safe area to fill whatever shape the
+     screen is: sideways on a 16:9 Chromebook, above and below on a 4:3 iPad. -->
+<div class="bleed" aria-hidden="true">
+  <div class="bleed__wall"></div>
+  <div class="bleed__trim"></div>
+  <div class="bleed__bench"></div>
+</div>
+
+<!-- Every layer inside is built from layer-manifest.json, so a re-render at
+     the same size is a pure file swap and nothing here carries a position. -->
+<main class="stage" id="stage" aria-label="Dissolving instrument"></main>
+
+<p class="rotate" role="alert">
+  <span class="rotate__glyph" aria-hidden="true"></span>
+  <b>Turn your device sideways</b>
+  <span>This instrument needs a landscape screen.</span>
+</p>
+
+<p class="boot" id="boot" hidden></p>
+
+<p class="visually-hidden" id="live" role="status" aria-live="polite"></p>
+
+<script src="../../kit/kit.js"></script>
+  <script src="../../kit/debug.js"></script>
+<script src="../../engines/particle-sim/sim.js"></script>
+<script src="../../engines/particle-sim/view.js"></script>
+<script src="instrument.js"></script>
+<script src="notebook.js"></script>
+<script src="activity.js"></script>
+</body>
+</html>

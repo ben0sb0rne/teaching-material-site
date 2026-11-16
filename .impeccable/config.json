@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "src/activities/explore-dissolving/index.html"
+        ],
+        "createdAt": "2026-10-28T06:38:10.833Z",
+        "reason": "Ben's spec: §5.2 'lit LEDs glow' (register is a physical LED panel) and §10 'a lit outline around the keycap' for focus. Literal emitted light on an instrument, not chrome. Only two shadows exist: dissolving.css:217 and :270."
+      }
+    ]
+  }
+}

@@ -1,0 +1,129 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Pedigree Descent</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1366px;height:768px;overflow:hidden}
+body{background:#EDE8DC;color:#0E141A;font:400 15px/1.35 Jost,system-ui,sans-serif;display:flex;flex-direction:column}
+.hd{height:54px;display:flex;align-items:center;gap:22px;padding:0 24px;border-bottom:1px solid #6E7C8A;flex:0 0 auto}
+.ttl{font-size:19px}.ttl b{color:#7A5A00;font-weight:500}
+.instr{font-size:17px}
+.gen{margin-left:auto;font:600 12px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;color:#46525F}
+.lbl{font:600 12px/1.3 'IBM Plex Mono',monospace;letter-spacing:.08em;color:#46525F;text-transform:uppercase}
+.nm{font:400 12px/1.3 Jost,sans-serif;color:#46525F;text-transform:none}
+.code{font:600 12px/1 'IBM Plex Mono',monospace;letter-spacing:.18em;color:#7A5A00}
+/* tree */
+.tree{flex:1;display:flex;flex-direction:column;justify-content:space-between;padding:10px 20px 6px;min-height:0}
+.band{display:flex;align-items:center;gap:14px;flex:0 0 auto}
+.gl{flex:0 0 28px;font:600 14px/1 'IBM Plex Mono',monospace;color:#7A5A00}
+.mid{flex:1;position:relative;min-width:0}
+.cts{flex:0 0 272px;display:flex;border:1px solid #6E7C8A;background:#F7F3E9}
+.cts>div{flex:1;padding:5px 8px;border-right:1px solid #BFC7CF}
+.cts>div:last-child{border-right:0}
+.n{font:600 16px/1.1 'IBM Plex Mono',monospace;color:#0F6340}
+.cts.ghost{border-style:dashed;background:none}.cts.ghost .n{color:#46525F}
+/* a mating pair: two dogs joined by a horizontal bar */
+.mate{display:flex;align-items:center;justify-content:center}
+.par{display:flex;flex-direction:column;align-items:center;gap:1px;padding:0 4px}
+.bar{width:56px;border-top:1px solid #6E7C8A;align-self:center;margin-bottom:14px}
+/* vertical drop from a centred mating pair */
+.drop{height:15px;position:relative;flex:0 0 auto}
+.drop::before{content:'';position:absolute;left:50%;top:0;height:100%;border-left:1px solid #6E7C8A}
+/* sibship: 8 equal cells, a bar across their centres, a tick down to each */
+.sibs{display:flex;position:relative;padding-top:13px}
+.sibs::before{content:'';position:absolute;top:0;left:6.25%;right:6.25%;border-top:1px solid #6E7C8A}
+.pup{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 2px 4px;border:1px solid transparent}
+.pup::before{content:'';position:absolute;left:50%;top:-13px;height:13px;border-left:1px solid #6E7C8A}
+.pup.kept{border-color:#7A5A00;background:#FFFDF6}
+.pup.e{border-style:dashed;border-color:#6E7C8A}
+.pup.e svg{visibility:hidden}
+.pup.e .nm{color:#46525F}
+/* the kept dog re-enters below as a parent: that repetition IS the descent */
+.from{display:flex;align-items:center;justify-content:center;gap:6px;height:17px}
+.from .lbl{color:#7A5A00}
+.foot{flex:0 0 62px;display:flex;align-items:center;gap:12px;padding:0 24px;border-top:1px solid #6E7C8A}
+.sp{flex:1}
+.btn{height:48px;padding:0 26px;background:#F5C518;color:#0E141A;font:500 15px/48px Jost,sans-serif}
+.btn2{height:48px;padding:0 22px;border:1px solid #6E7C8A;font:400 15px/46px Jost,sans-serif}
+</style></head><body>
+
+<svg width="0" height="0" style="position:absolute"><g id="dogshapes">
+<rect x="60" y="78" width="10" height="28" rx="4" fill="#8E6338"/><rect x="110" y="78" width="10" height="28" rx="4" fill="#8E6338"/>
+<rect x="48" y="50" width="90" height="38" rx="19" fill="#B4875A"/>
+<rect x="72" y="80" width="11" height="28" rx="4" fill="#B4875A"/><rect x="122" y="80" width="11" height="28" rx="4" fill="#B4875A"/>
+<rect x="44" y="38" width="24" height="34" rx="11" fill="#B4875A"/><circle cx="40" cy="36" r="17" fill="#B4875A"/>
+<rect x="12" y="35" width="30" height="16" rx="8" fill="#B4875A"/>
+<path d="M134 62 Q153 52 149 31" fill="none" stroke="#B4875A" stroke-width="13" stroke-linecap="round"/>
+<path d="M43 26 Q58 24 58 42 Q58 60 50 62 Q42 60 43 42 Z" fill="#8E6338"/>
+</g><symbol id="dog" viewBox="0 0 160 120">
+<use href="#dogshapes" stroke="#46525F" stroke-width="5" stroke-linejoin="round"/><use href="#dogshapes"/>
+<circle cx="31" cy="31" r="3.2" fill="#fff" stroke="#46525F" stroke-width="1"/><circle cx="30.4" cy="31" r="2" fill="#111"/><circle cx="13" cy="39" r="3.4" fill="#111"/>
+<rect x="47" y="40" width="7" height="26" rx="3" fill="#2F6FD6" stroke="#46525F" stroke-width="1"/></symbol></svg>
+
+<div class="hd"><div class="ttl">Explore <b>Inheritance</b></div>
+<div class="instr">Choose one puppy to keep.</div>
+<div class="gen">F2 &middot; LITTER OF 8</div></div>
+
+<div class="tree">
+
+ <div class="band"><div class="gl">P</div><div class="mid">
+   <div class="mate">
+    <div class="par"><svg width="78" height="59"><use href="#dog"/></svg><div class="nm">Juno &#9792;</div></div>
+    <div class="bar"></div>
+    <div class="par"><svg width="78" height="59"><use href="#dog"/></svg><div class="nm">Bruno &#9794;</div></div>
+   </div></div>
+  <div class="cts"><div><div class="lbl">Beard</div><div class="n">1</div></div><div><div class="lbl">None</div><div class="n">1</div></div><div><div class="lbl">Short</div><div class="n">1</div></div><div><div class="lbl">Long</div><div class="n">1</div></div></div></div>
+
+ <div class="band"><div class="gl"></div><div class="mid"><div class="drop"></div></div><div class="cts" style="visibility:hidden"></div></div>
+
+ <div class="band"><div class="gl">F1</div><div class="mid">
+   <div class="sibs">
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Ash</div></div>
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Rye</div></div>
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Fig</div></div>
+    <div class="pup kept"><svg width="56" height="42"><use href="#dog"/></svg><div class="code">YKJH7</div></div>
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Sage</div></div>
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Juniper</div></div>
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Birch</div></div>
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Cedar</div></div>
+   </div></div>
+  <div class="cts"><div><div class="lbl">Beard</div><div class="n">8</div></div><div><div class="lbl">None</div><div class="n">0</div></div><div><div class="lbl">Short</div><div class="n">8</div></div><div><div class="lbl">Long</div><div class="n">0</div></div></div></div>
+
+ <div class="band"><div class="gl"></div><div class="mid"><div class="from"><span class="lbl">Biscuit kept &rarr; bred with</span></div>
+   <div class="mate">
+    <div class="par"><svg width="60" height="45"><use href="#dog"/></svg><div class="code">YKJH7</div></div>
+    <div class="bar" style="margin-bottom:12px"></div>
+    <div class="par"><svg width="60" height="45"><use href="#dog"/></svg><div class="code">HP9PA</div></div>
+   </div><div class="drop"></div></div>
+  <div class="cts" style="visibility:hidden"></div></div>
+
+ <div class="band"><div class="gl">F2</div><div class="mid">
+   <div class="sibs">
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Biscuit</div></div>
+    <div class="pup kept"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Pepper</div></div>
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Mochi</div></div>
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Scout</div></div>
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Olive</div></div>
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Waffles</div></div>
+    <div class="pup"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">Clover</div></div>
+    <div class="pup e"><svg width="56" height="42"><use href="#dog"/></svg><div class="nm">8</div></div>
+   </div></div>
+  <div class="cts"><div><div class="lbl">Beard</div><div class="n">6</div></div><div><div class="lbl">No beard</div><div class="n">2</div></div><div><div class="lbl">Short</div><div class="n">5</div></div><div><div class="lbl">Long</div><div class="n">3</div></div></div></div>
+
+ <div class="band"><div class="gl"></div><div class="mid"><div class="from"><span class="lbl">choose one to breed F3</span></div></div><div class="cts" style="visibility:hidden"></div></div>
+
+ <div class="band"><div class="gl">F3</div><div class="mid">
+   <div class="sibs" style="--x:0">
+    <div class="pup e"><svg width="56" height="42"><use href="#dog"/></svg></div>
+    <div class="pup e"><svg width="56" height="42"><use href="#dog"/></svg></div>
+    <div class="pup e"><svg width="56" height="42"><use href="#dog"/></svg></div>
+    <div class="pup e"><svg width="56" height="42"><use href="#dog"/></svg></div>
+    <div class="pup e"><svg width="56" height="42"><use href="#dog"/></svg></div>
+    <div class="pup e"><svg width="56" height="42"><use href="#dog"/></svg></div>
+    <div class="pup e"><svg width="56" height="42"><use href="#dog"/></svg></div>
+    <div class="pup e"><svg width="56" height="42"><use href="#dog"/></svg></div>
+   </div></div>
+  <div class="cts ghost"><div><div class="lbl">Beard</div><div class="n">&mdash;</div></div><div><div class="lbl">No beard</div><div class="n">&mdash;</div></div><div><div class="lbl">Short</div><div class="n">&mdash;</div></div><div><div class="lbl">Long</div><div class="n">&mdash;</div></div></div></div>
+
+</div>
+
+<div class="foot"><span class="lbl">Copy each row to your sheet</span><div class="sp"></div>
+ <div class="btn2">Breed again</div><div class="btn">Keep this puppy</div></div>
+</body></html>
