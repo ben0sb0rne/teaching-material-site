@@ -20,3 +20,7 @@ __pycache__/
 # about the project. The mocks and surfaces beside it are design history and
 # do stay in.
 .impeccable/hook.cache.json
+
+# Local whole-folder snapshots. These carry art-source and .git, so they are
+# a standalone restore -- and a 66 MB binary git would store whole, every time.
+teaching-material-site-*.zip
