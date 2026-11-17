@@ -19,23 +19,30 @@
 
 :root {
   /* From the spec's colour table. */
-  --p-water:  #5B8FD6;
+  --p-water:  #4376C6;
 
-  /* One hue per substance. All six are white powders in the beaker — the
-     colour is a reading aid in the magnified view only, which is why each
-     must stay apart from the others and from water. Colour is never the
-     only cue: the nameplate, the position and the ID readout all say which
-     is which. */
-  --p-nacl:    #8E7CC3;
-  --p-caco3:   #E9E4D6;
-  --p-sucrose: #D2603F;
-  --p-nahco3:  #6FB07A;
-  --p-mgso4:   #C9A227;
-  --p-cacl2:   #D4567C;
+  /* Every one of the six is a white powder, so every one is drawn white.
+     They differ the way real samples differ — salt a cold glassy white,
+     chalk the flat matte one, sugar warm, Epsom faintly cool — and the
+     spread is deliberately too small to name a substance by: measured
+     pairwise it is dE2000 2.3 to 9.0, visible side by side, useless as a
+     code. That is the lesson. What tells the stations apart is the
+     nameplate, the LED register and the ID readout, none of which went
+     white. Do not re-saturate these to make them legible; legibility here
+     would be a lie about what is in the bottle. */
+  --p-nacl:    #F2F4F7;   /* cubic, cold, glassy */
+  --p-caco3:   #E6E2D8;   /* chalk: matte, warm-grey, the dullest of the six */
+  --p-sucrose: #F4EFE3;   /* warm white */
+  --p-nahco3:  #EFF0EE;   /* dense neutral white */
+  --p-mgso4:   #ECF3F3;   /* needles, faint cool cast */
+  --p-cacl2:   #E8ECF2;   /* hygroscopic, slightly glassy blue-grey */
 
-  /* The lamp a dissolved particle lights. Kept apart from --p-* because a
-     diode reads brighter than the sphere it stands for; sucrose keeps the
-     value its lamps have always had. */
+  /* The lamp a dissolved particle lights, and the dot on the nameplate.
+     These stayed coloured when the particles went white, and they are now
+     the only per-substance colour on the bench — a register is an
+     instrument readout, not a picture of the powder, so coding it by hue
+     claims nothing false. With the spheres all white this is what keeps
+     left and right apart at a glance. */
   --led-nacl:    #A992E0;
   --led-caco3:   #E9E4D6;
   --led-sucrose: #FF7A52;
@@ -44,19 +51,35 @@
   --led-cacl2:   #F26A95;
 
   /* Shoulder and terminator for each particle sphere, which the engine
-     shades between. Derived from the three above, not new colours. */
-  --p-water-lit: #B9D4F5;  --p-water-dim: #22406B;
-  --p-nacl-lit:    #C9BCEA;  --p-nacl-dim:    #4A3C73;
-  --p-caco3-lit:   #FFFFFF;  --p-caco3-dim:   #8E8878;
-  --p-sucrose-lit: #FFA98C;  --p-sucrose-dim: #7A2E18;
-  --p-nahco3-lit:  #B4DCBB;  --p-nahco3-dim:  #2F5F39;
-  --p-mgso4-lit:   #F2D97A;  --p-mgso4-dim:   #6E5610;
-  --p-cacl2-lit:   #F7A9BF;  --p-cacl2-dim:   #78243C;
+     shades between.
+
+     The water shoulder is the load-bearing one. makeSprite puts `lit` at
+     gradient stop 0 and `base` only at 0.34, so the shoulder is a third of
+     every sphere, not a sliver. At the old #B9D4F5 it was near-white, and a
+     white powder grain touching a water sphere met it at 1.03:1 — the
+     boundary between solute and solvent simply vanished. Pulling it to
+     #6E9BD8 takes that to 2.5:1 while water still reads 5.9:1 against the
+     field. Every particle also carries a hard white specular of radius
+     0.30r from the engine; that is only 9% of the area, so the shoulder is
+     where the contrast had to come from. */
+  --p-water-lit: #6E9BD8;  --p-water-dim: #2A4D7E;
+  --p-nacl-lit:    #FFFFFF;  --p-nacl-dim:    #9AA3AE;
+  --p-caco3-lit:   #F6F3EB;  --p-caco3-dim:   #948F84;
+  --p-sucrose-lit: #FFFBF1;  --p-sucrose-dim: #A89B86;
+  --p-nahco3-lit:  #FCFDFB;  --p-nahco3-dim:  #9BA09B;
+  --p-mgso4-lit:   #FAFFFF;  --p-mgso4-dim:   #93A2A2;
+  --p-cacl2-lit:   #F7FAFF;  --p-cacl2-dim:   #929AA4;
 
   /* Boiling. A bubble is a pocket of vapour, so it reads lighter than the
      water it rises through, with a bright cap where the light catches it.
+
+     Re-tuned when the water went blue, which is the re-check the old note
+     here asked for. The old #CFE4FA was MORE saturated than the water
+     (+43 against +23 on screen), so a bubble read as a bluer drop rather
+     than as an absence of liquid. This one is lighter AND less blue than
+     the body it rises through, which is what a vapour pocket looks like.
      Tuned against the placeholder water; re-check when the render lands. */
-  --bubble:     #CFE4FA;
+  --bubble:     #E0E9F2;
   --bubble-lit: #FFFFFF;
 
   --display-bg:    #17202B;

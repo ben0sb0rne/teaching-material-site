@@ -82,8 +82,15 @@ GRAIN_GAP = 9.0
 #         tint the water came out only 17 points darker than it, which at the
 #         125px a beaker occupies is invisible — the beaker just looked empty.
 #         ~38 points is what reads from the back of a classroom.
-WATER_BLUE, WATER_LIT = "#B6C0C7", "#E4EAEE"   # the pour stream
-WATER_TINT = (174, 182, 188)                   # the liquid in the beaker
+#
+# Ben then asked for the water to read blue. Going back to the pale #BFD8EC is
+# not the way: what made that one a pool was not its hue but that it rendered
+# only 18 points darker than the wall. The two dials above are independent, so
+# this turns the hue UP and the tone DOWN together -- an on-screen gap of 22
+# where the pool had 12, over a body 42 points darker than the wall where the
+# pool had 18. Blue, and still a beaker of water rather than a slab of dye.
+WATER_BLUE, WATER_LIT = "#AEBFD1", "#DFE8F2"   # the pour stream
+WATER_TINT = (162, 180, 202)                   # the liquid in the beaker
 WATER_ALPHA = 0.55          # a beaker of water is see-through, not a blue slab
 # The two bench positions. Layer ids end in one of these; substances do not
 # appear in any filename except the lamps.

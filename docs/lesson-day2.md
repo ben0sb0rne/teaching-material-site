@@ -143,6 +143,19 @@ Worth knowing before standing in front of the class.
   Investigation 1 background, which defines a particle as the formula unit.
 - **There is no filter.** `exp-filter` brings in the result from the bench
   instead.
+- **The powders are all white in the viewport, but the lamps are not.** The
+  six particle colours were a reading aid, and they quietly contradicted the
+  lesson above: a student could tell the samples apart by hue, which is the
+  one thing you cannot do in the room. They are now six shades of white, too
+  close together to identify a substance by — you have to watch what it
+  does. The LED register and the nameplate dot stayed colour-coded, because a
+  register is an instrument readout rather than a picture of the powder, and
+  with white spheres on both sides they are what keeps left and right apart
+  at a glance.
+- **Water is blue, and that is a convention.** Real water in a beaker is
+  nearly colourless. It is drawn blue so a white grain has something to be
+  seen against; worth saying out loud if a student asks, since this is the
+  same class that has just been told the powders are all white.
 
 ## Running it
 
