@@ -273,12 +273,33 @@ body {
 
 /* Rasters are decoration; the instrument's meaning is in the real buttons,
    the displays and the live region. Keycaps are rasters too, and they are
-   not decoration. */
-.layer[data-render^="raster"]:not(button) { pointer-events: none; }
+   not decoration. And nor is a raster that carries a data-id, which is the
+   :not() below: without it this rule beat the one underneath on specificity
+   — (0,2,1) against (0,2,0) — and every identifiable raster was silently
+   unhoverable, which is the opposite of what the next rule says. */
+.layer[data-render^="raster"]:not(button):not([data-id]) { pointer-events: none; }
 
-/* Anything identifiable takes the pointer back, so hovering a beaker or a
-   stir plate can name it. */
+/* Anything identifiable takes the pointer back, so hovering a stir plate
+   can name it. */
 .layer[data-id] { pointer-events: auto; }
+
+/* Two exceptions, and the reason is the layer system rather than these two
+   layers. A layer's hit area is its whole manifest box, transparent art
+   included. The beaker glass [162.75, 730, 162.5, 187.5] and the sample
+   head [144, 700, 200, 165] are full-box rectangles sitting directly over
+   the three things in this group actually worth naming, and both paint
+   above them in ORDER. Measured over a 10-point grid of the bench, letting
+   them take the pointer gains Beaker and Sample head and costs all three:
+
+       stirbar  15 → 0      nozzle  76 → 0      chute  114 → 0
+
+   A glass is not more interesting than what is inside it, so they stay out.
+   IDENTITY.beaker and IDENTITY.head are therefore unreachable by pointer
+   and will stay that way until the beaker group is restacked or given hit
+   areas that are not its paint boxes. refract-{s} is not the way round it:
+   it is clipped to the water line, so at rest there is nothing to hit. */
+.layer[data-layer^="beaker-"],
+.layer[data-layer^="head-"] { pointer-events: none; }
 
 /* --------------------------------------------------------------------------
    Displays. Offsets inside each cut-out come from the sketches; the cut-out
