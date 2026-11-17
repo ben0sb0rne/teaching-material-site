@@ -15,7 +15,13 @@
   'use strict';
 
   var KEY = 'tms.debug';
-  var DEFAULTS = { textures: 'finished', shortcuts: 'on', outlines: 'off' };
+  /* `notebook` is off by default on purpose, not as a debug convenience:
+     Explore Dissolving ships with its notebook column dark until the
+     items are ready, and a default of 'on' would put thirteen unfinished
+     buttons in front of a class. Like `outlines`, what the class means is
+     the activity's business; a page with no such rules just carries it. */
+  var DEFAULTS = { textures: 'finished', shortcuts: 'on', outlines: 'off',
+                   notebook: 'off' };
 
   /* Private windows and cleared site data both throw or come back empty, and
      neither is a reason for the site to stop working. */
@@ -147,6 +153,11 @@
       { label: 'On', value: 'on' }
     ], outlines));
 
+    el.appendChild(choices('Notebook', 'notebook', [
+      { label: 'Off', value: 'off' },
+      { label: 'On', value: 'on' }
+    ], notebook));
+
     var actions = document.createElement('div');
     actions.className = 'dbg__row';
     var clear = button('Clear cache and reload', function () { clearCacheAndReload(clear); });
@@ -198,7 +209,16 @@
   function outlines(on) {
     if (document.body) document.body.classList.toggle('is-debug', on === 'on');
   }
-  ready(function () { outlines(Debug.get('outlines')); });
+
+  /* Read live rather than at boot, so the row needs no page reload: the
+     column is only ever hidden with display:none, never unbuilt. */
+  function notebook(on) {
+    if (document.body) document.body.classList.toggle('no-notebook', on === 'off');
+  }
+  ready(function () {
+    outlines(Debug.get('outlines'));
+    notebook(Debug.get('notebook'));
+  });
 
   /* A key is not enough on its own. Backtick is bound to something in some
      browsers, modifier chords are bound to something in all of them, and a

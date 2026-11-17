@@ -242,9 +242,17 @@
 
   var IDENTITY = {
     'particle-water':      ['Water particle', 'Water, the solvent. Constantly moving and colliding.'],
-    'scalebar':  ['Scale bar', '1 nanometre, one billionth of a metre.'],
-    'viewport':  ['Viewport', '13.6 nanometres across — 22,000 of these would cross one grain of table salt.'],
-    'register':  ['Register', 'Particles dissolved. One light per particle.'],
+    /* The three lines that have to admit what they are. Everything else in
+       this table describes equipment that exists — a stir plate, a
+       thermometer, a timer. These three describe something no instrument
+       can do, and a reader who is not told that will reasonably assume the
+       machine is claiming otherwise. The scale bar's caveat is one the code
+       has carried since the first build (see SCHEMATIC above) and never
+       said out loud: the solute is drawn at its real relative size, the
+       water knowingly is not. */
+    'scalebar':  ['Scale bar', '1 nanometre, one billionth of a metre. The water is drawn oversized.'],
+    'viewport':  ['Particle model', 'A model, not a view — no instrument sees particles. 13.6 nm across.'],
+    'register':  ['Register', 'One light per particle the model has freed. Nothing could count these.'],
     'counter':   ['Counter', 'Particles dissolved, out of ' + SOLUTE + '.'],
     'heat':      ['Water temperature', 'Hotter water is faster particles, so they hit the solid harder and more often.'],
     'clock':     ['Clock', 'Seconds since water was added.'],
@@ -472,7 +480,15 @@
           '<span class="scalebar" data-id="scalebar" style="left:' +
           (box[2] * 0.09).toFixed(1) + 'px; top:' + (box[3] * 0.42).toFixed(1) + 'px">' +
           '<span class="scalebar__label">1 nm</span>' +
-          '<span class="scalebar__bar" style="--nm-bar:' + bar.toFixed(2) + 'px"></span></span>';
+          '<span class="scalebar__bar" style="--nm-bar:' + bar.toFixed(2) + 'px"></span></span>' +
+          /* Etched across the top of the field, where it is only ever sparse
+             solvent. Sixteen identify lines in this machine describe real
+             equipment and three describe something impossible; without this
+             the eyepiece is the one part that looks like a window and is
+             not. It takes no pointer — a tap here should still reach the
+             particle under it, and the readout names the model anyway. */
+          '<span class="modelmark" aria-hidden="true" style="top:' +
+          (box[3] * 0.055).toFixed(1) + 'px">Particle model</span>';
       } },
 
       'notebook-text': { make: function (node) { node.id = 'notebook'; } },

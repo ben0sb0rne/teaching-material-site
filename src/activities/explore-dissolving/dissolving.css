@@ -88,6 +88,7 @@
   --display-bezel: #2F3134;
   --plate-ink:     #18191B;   /* engraved on a light plate, not a dark one */
 
+  --lens-ink:  #FFFFFF;       /* furniture etched on the glass: scale bar, model mark */
   --lens-bg:   #0F1D2E;       /* the dark field inside the viewport */
   --lens-hair: #2A3E57;       /* etched crosshair and barrel ticks */
   --engrave:   #C8CCC0;       /* engraved panel lettering */
@@ -544,7 +545,7 @@ body {
 .scalebar__label {
   display: block;
   font: 600 11px/1.3 var(--font-mono);
-  color: #fff;
+  color: var(--lens-ink);
 }
 
 /* --nm-bar is the true 1 nm span, set from the model's own geometry. One
@@ -555,15 +556,38 @@ body {
   display: block;
   width: calc(var(--nm-bar) + var(--tick));
   height: 9px;
-  border-left: var(--tick) solid #fff;
-  border-right: var(--tick) solid #fff;
+  border-left: var(--tick) solid var(--lens-ink);
+  border-right: var(--tick) solid var(--lens-ink);
   position: relative;
+}
+
+/* The eyepiece is the one part of this bench that looks like a window and is
+   not one, so it says so on the glass. Same plate treatment as the scale bar
+   it shares the field with, because it is the same kind of thing: furniture
+   etched on the eyepiece, not anything the model contains. Centred across
+   the top, where the field is only ever sparse solvent. */
+.modelmark {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 2px 7px 3px;
+  background: var(--lens-bg);
+  border-radius: 3px;
+  font: 600 9px/1 var(--font-mono);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--lens-ink);
+  white-space: nowrap;
+  /* A tap here still reaches the particle underneath. The readout names the
+     model on hover anyway, so the mark never needs the pointer itself. */
+  pointer-events: none;
 }
 
 .scalebar__bar::after {
   content: "";
   position: absolute; left: 0; right: 0; top: 50%;
-  border-top: 1.8px solid #fff;
+  border-top: 1.8px solid var(--lens-ink);
 }
 
 /* --------------------------------------------------------------------------
@@ -995,6 +1019,16 @@ body {
    -------------------------------------------------------------------------- */
 
 @page { size: landscape; margin: 10mm; }
+
+/* The debug menu's Notebook row, off by default. display:none rather than
+   visibility, so the thirteen notebook buttons leave the tab order too --
+   hiding them but keeping them focusable would be worse than leaving them
+   visible. The Notebook object still builds and still listens on the bus;
+   only its column is gone. Consequence worth knowing: the print page below
+   is designed around the notebook being readable, so with this off a
+   printout is a picture of the machine and nothing the student wrote. */
+.no-notebook [data-layer="notebook-paper"],
+.no-notebook [data-layer="notebook-text"] { display: none; }
 
 @media print {
   html, body { background: #fff; overflow: visible; height: auto; }
