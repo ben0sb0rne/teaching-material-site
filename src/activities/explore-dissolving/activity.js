@@ -491,6 +491,31 @@
           (box[3] * 0.055).toFixed(1) + 'px">Particle model</span>';
       } },
 
+      /* The substance shelf, and it is scenery. Nothing here is a button,
+         nothing takes the pointer, and the whole rack is aria-hidden, so
+         the control count and the tab order are exactly what they were.
+
+         It is here because the column the notebook vacated is 450 points of
+         bare wall, and because this is where the samples will come from
+         when the shelf is wired: one jar per substance, each with its own
+         spoon, which is the kit's own rule. Showing the destination costs
+         nothing and explains the bench. */
+      'shelf': { make: function (node) {
+        node.classList.add('shelf');
+        node.setAttribute('aria-hidden', 'true');
+        var out = '';
+        for (var i = 0; i < CYCLE.length; i++) {
+          var k = CYCLE[i], q = SUBSTANCE[k];
+          out += '<i class="jar" style="--jar-powder: var(--p-' + k + ')">' +
+                   '<i class="jar__glass"><i class="jar__fill"></i>' +
+                   '<i class="jar__spoon"></i></i>' +
+                   '<i class="jar__cap"></i>' +
+                   '<b class="jar__label">' + q.formula + '</b>' +
+                 '</i>';
+        }
+        node.innerHTML = out;
+      } },
+
       'notebook-text': { make: function (node) { node.id = 'notebook'; } },
 
       /* A slider, because the temperature is a continuous quantity and sliding

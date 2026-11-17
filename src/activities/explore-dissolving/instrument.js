@@ -34,6 +34,7 @@
     'key-freeze', 'key-stir', 'key-reset', 'key-dispense', 'heat',
     'nameplate-{s}',
     'viewport-ring-{s}', 'viewport-field-{s}', 'glass-viewport-{s}',
+    'shelf',
     'notebook-paper', 'notebook-text'
   ];
 

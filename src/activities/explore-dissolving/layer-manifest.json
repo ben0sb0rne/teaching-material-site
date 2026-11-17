@@ -583,5 +583,16 @@
       309,
       863
     ]
+  },
+  {
+    "id": "shelf",
+    "render": "code",
+    "notes": "Decorative substance shelf. Not wired: it shows where the samples will come from.",
+    "box_1x": [
+      1200,
+      120,
+      340,
+      580
+    ]
   }
 ]

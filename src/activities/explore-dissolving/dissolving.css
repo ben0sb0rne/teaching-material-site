@@ -93,6 +93,12 @@
   --lens-hair: #2A3E57;       /* etched crosshair and barrel ticks */
   --engrave:   #C8CCC0;       /* engraved panel lettering */
 
+  /* The shelf's steel. Three flat tones: a rack, a lit top face, a shadowed
+     one. Depth in here is contrast and overlap, never a gradient. */
+  --steel:      #B9BCC0;
+  --steel-dim:  #8E9297;
+  --steel-lit:  #D8DBDE;
+
   --under-bench: #0C0D0E;     /* the shadow under the front edge of the bench */
 
   --note-paper: #FBF8F0;
@@ -1030,6 +1036,79 @@ body {
 .no-notebook [data-layer="notebook-paper"],
 .no-notebook [data-layer="notebook-text"] { display: none; }
 
+/* --------------------------------------------------------------------------
+   The substance shelf. Scenery, for now: it shows where the samples will
+   come from once it is wired, and it fills the 450 points of bare wall the
+   notebook left behind. Nothing in here takes a pointer or a tab stop.
+
+   Flat, like the rest: a dark rack, a lit top face, and jars that differ by
+   label and by nothing else, because all six are white powders and that is
+   the lesson's own point. Each jar's contents use that substance's own
+   --p-<key>, the same value the particle view uses, so the shelf and the
+   field agree without a student being told that they do.
+   -------------------------------------------------------------------------- */
+.shelf {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr;
+  column-gap: 12px;
+  row-gap: 20px;
+  padding: 16px;
+  background: var(--steel-dim);
+  border-radius: 4px;
+  box-shadow: inset 0 3px 0 var(--steel);
+  /* Scenery. A tap on it should reach the wall behind, not stop here. */
+  pointer-events: none;
+}
+
+.jar { position: relative; display: block; border-bottom: 4px solid var(--cap-edge); }
+
+.jar__glass {
+  position: absolute;
+  left: 14%; right: 14%; top: 14%; bottom: 4px;
+  background: var(--steel-lit);
+  border: 1.5px solid var(--steel-dim);
+  border-radius: 3px 3px 6px 6px;
+}
+
+.jar__fill {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 54%;
+  background: var(--jar-powder, var(--steel-lit));
+  border-radius: 0 0 5px 5px;
+}
+
+/* Its own spoon, standing in it — a minispoon serves its vial and no
+   other, and that rule is why a spoonful will travel rather than a spoon.
+   Dark, because a steel handle on a steel rack is one you cannot see. */
+.jar__spoon {
+  position: absolute;
+  right: 16%; top: -22%;
+  width: 5px; height: 54%;
+  background: var(--cap-edge);
+  border-radius: 2px 2px 0 0;
+}
+
+.jar__cap {
+  position: absolute;
+  left: 24%; right: 24%; top: 0;
+  height: 15%;
+  background: var(--cap-edge);
+  border-radius: 2px 2px 0 0;
+}
+
+.jar__label {
+  position: absolute;
+  left: 10%; right: 10%; top: 46%;
+  padding: 3px 0;
+  background: var(--cap-face);
+  color: var(--plate-ink);
+  font: 600 13px/1.1 var(--font-mono);
+  text-align: center;
+  border-radius: 2px;
+}
+
 @media print {
   html, body { background: #fff; overflow: visible; height: auto; }
   .bleed, .rotate, .boot { display: none !important; }
@@ -1043,6 +1122,17 @@ body {
   .viewport__dry, .layer[data-render="raster-overlay"] { display: none; }
   .key:focus-visible::after,
   .plate:focus-visible::after { display: none; }
+
+  /* A browser prints no background fills, so the shelf would come out as
+     blank paper. On paper each piece is its outline; the powder keeps its
+     fill, or a full jar and an empty one would print identically. */
+  .shelf, .jar__glass, .jar__cap, .jar__spoon {
+    background: none;
+    border: 1px solid var(--cap-ink);
+    box-shadow: none;
+  }
+  .jar__label { background: none; color: var(--cap-ink); }
+  .jar__fill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
   /* A browser does not print background colours, so the displays would come
      out as pale amber on bare paper — and the glass rasters that would have
